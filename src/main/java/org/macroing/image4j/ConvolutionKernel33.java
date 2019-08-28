@@ -22,7 +22,9 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * This {@code ConvolutionKernel33} class represents a convolution kernel with three rows and three columns.
+ * A {@code ConvolutionKernel33} is a convolution kernel with three rows and three columns.
+ * <p>
+ * This class is immutable and therefore suitable for concurrent use without external synchronization.
  * 
  * @since 1.0.0
  * @author J&#246;rgen Lundgren

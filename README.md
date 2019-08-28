@@ -4,9 +4,11 @@ Image4J is an image processing library for Java.
 
 Getting Started
 ---------------
-To clone this repository, you can type the following in Git Bash.
+To clone this repository and build the project, you can type the following in Git Bash. You need Apache Ant though.
 ```bash
 git clone https://github.com/macroing/Image4J.git
+cd Image4J
+ant
 ```
 
 Dependencies

@@ -21,7 +21,7 @@ package org.macroing.image4j;
 import java.util.Objects;
 
 /**
- * This {@code Color} class is used to encapsulate colors in the default {@code sRGB} color space.
+ * A {@code Color} encapsulates a color in the default {@code sRGB} color space.
  * <p>
  * This class is immutable and therefore suitable for concurrent use without external synchronization.
  * <p>
@@ -885,7 +885,7 @@ public final class Color {
 	 * <p>
 	 * This method assumes the component value to be within the range {@code [0.0, 1.0]}. A component value outside of this range will be clamped.
 	 * <p>
-	 * If the component values are outside the range {@code [0.0, 1.0]}, you may want to call {@link #minimumToZero()} followed by {@link #maximumToOne()}, in order to preserve the ratios between the component values.
+	 * If the component values are outside the range {@code [0.0, 1.0]}, you may want to call {@link #minTo0()} followed by {@link #maxTo1()}, in order to preserve the ratios between the component values.
 	 * 
 	 * @return the value of the red component (R) as an {@code int}
 	 */

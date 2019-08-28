@@ -35,7 +35,7 @@ import java.util.function.Function;
 import javax.imageio.ImageIO;
 
 /**
- * This {@code Image} class represents an image that can be drawn to.
+ * An {@code Image} is an image that can be drawn to.
  * <p>
  * This class stores individual colors as {@link Color} instances.
  * 
