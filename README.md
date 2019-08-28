@@ -22,8 +22,8 @@ public class BlendExample {
         Image image_0 = Image.load("Image-0.png");
         Image image_1 = Image.load("Image-1.png");
         
-        Image image_Result = Image.blend(image_0, image_1, 0.5F);
-        image_Result.save("Image-Result.png");
+        Image image = Image.blend(image_0, image_1, 0.5F);
+        image.save("Image-Result.png");
     }
 }
 ```
@@ -51,8 +51,8 @@ public class CropExample {
     public static void main(String[] args) {
         Image image = Image.load("Image.png");
         
-        Image image_Result = image.crop(50, 50, image.getResolutionX() - 50, image.getResolutionY() - 50, Color.BLACK, false, false);
-        image_Result.save("Image-Result.png");
+        image = image.crop(50, 50, image.getResolutionX() - 50, image.getResolutionY() - 50, Color.BLACK, false, false);
+        image.save("Image-Result.png");
     }
 }
 ```
