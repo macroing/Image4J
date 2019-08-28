@@ -50,7 +50,6 @@ import org.macroing.image4j.Image;
 public class CropExample {
     public static void main(String[] args) {
         Image image = Image.load("Image.png");
-        
         image = image.crop(50, 50, image.getResolutionX() - 50, image.getResolutionY() - 50, Color.BLACK, false, false);
         image.save("Image-Result.png");
     }
