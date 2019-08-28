@@ -36,9 +36,8 @@ import org.macroing.image4j.Image;
 public class ConvolutionKernelExample {
     public static void main(String[] args) {
         Image image = Image.load("Image.png");
-        
-        Image image_Result = image.multiply(ConvolutionKernel33.SHARPEN);
-        image_Result.save("Image-Result.png");
+        image.multiply(ConvolutionKernel33.SHARPEN);
+        image.save("Image-Result.png");
     }
 }
 ```
@@ -66,9 +65,8 @@ import org.macroing.image4j.Image;
 public class UpdateExample {
     public static void main(String[] args) {
         Image image = Image.load("Image.png");
-        
-        Image image_Result = image.update(color -> Color.blend(color, Color.randomRed(), 0.5F));
-        image_Result.save("Image-Result.png");
+        image.update(color -> Color.blend(color, Color.randomRed(), 0.5F));
+        image.save("Image-Result.png");
     }
 }
 ```
