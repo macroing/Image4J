@@ -11,6 +11,68 @@ cd Image4J
 ant
 ```
 
+Examples
+--------
+The following example loads two images from your hard drive, blends them together and saves the result to your hard drive.
+```java
+import org.macroing.image4j.Image;
+
+public class BlendExample {
+    public static void main(String[] args) {
+        Image image_0 = Image.load("Image-0.png");
+        Image image_1 = Image.load("Image-1.png");
+        
+        Image image_Result = Image.blend(image_0, image_1, 0.5F);
+        image_Result.save("Image-Result.png");
+    }
+}
+```
+
+The following example loads an image from your hard drive, multiplies it with a convolution kernel and saves the result to your hard drive.
+```java
+import org.macroing.image4j.ConvolutionKernel33;
+import org.macroing.image4j.Image;
+
+public class ConvolutionKernelExample {
+    public static void main(String[] args) {
+        Image image = Image.load("Image.png");
+        
+        Image image_Result = image.multiply(ConvolutionKernel33.SHARPEN);
+        image_Result.save("Image-Result.png");
+    }
+}
+```
+
+The following example loads an image from your hard drive, crops it and saves the result to your hard drive.
+```java
+import org.macroing.image4j.Color;
+import org.macroing.image4j.Image;
+
+public class CropExample {
+    public static void main(String[] args) {
+        Image image = Image.load("Image.png");
+        
+        Image image_Result = image.crop(50, 50, image.getResolutionX() - 50, image.getResolutionY() - 50, Color.BLACK, false, false);
+        image_Result.save("Image-Result.png");
+    }
+}
+```
+
+The following example loads an image from your hard drive, updates it with a function and saves the result to your hard drive.
+```java
+import org.macroing.image4j.Color;
+import org.macroing.image4j.Image;
+
+public class UpdateExample {
+    public static void main(String[] args) {
+        Image image = Image.load("Image.png");
+        
+        Image image_Result = image.update(color -> Color.blend(color, Color.randomRed(), 0.5F));
+        image_Result.save("Image-Result.png");
+    }
+}
+```
+
 Dependencies
 ------------
  - [Java 8](http://www.java.com).
