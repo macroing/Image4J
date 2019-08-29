@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javax.imageio.ImageIO;
@@ -523,6 +524,15 @@ public final class Image {
 	 * The coordinates {@code x} and {@code y} are allowed to be outside of the boundaries of this {@code Image} instance.
 	 * <p>
 	 * If {@code image} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * This method currently performs a simple Alpha blending operation. See the code below. It might change in the future.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * currentImage.drawImage(x, y, image, (colorA, colorB) -> Color.blend(colorA, colorB, colorB.a));
+	 * }
+	 * </pre>
 	 * 
 	 * @param x the X-coordinate of this {@code Image} instance to draw to
 	 * @param y the Y-coordinate of this {@code Image} instance to draw to
@@ -530,9 +540,30 @@ public final class Image {
 	 * @throws NullPointerException thrown if, and only if, {@code image} is {@code null}
 	 */
 	public void drawImage(final int x, final int y, final Image image) {
+		drawImage(x, y, image, (colorA, colorB) -> Color.blend(colorA, colorB, colorB.a));
+	}
+	
+	/**
+	 * Draws {@code image} to this {@code Image} instance starting at {@code x} and {@code y}.
+	 * <p>
+	 * The coordinates {@code x} and {@code y} are allowed to be outside of the boundaries of this {@code Image} instance.
+	 * <p>
+	 * In this documentation {@code colorA} refers to the {@code Color} of this {@code Image} instance and {@code colorB} refers to the {@code Color} of {@code image}.
+	 * <p>
+	 * If either {@code image} or {@code biFunction} are {@code null} or {@code biFunction.apply(colorA, colorB)} returns {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param x the X-coordinate of this {@code Image} instance to draw to
+	 * @param y the Y-coordinate of this {@code Image} instance to draw to
+	 * @param image the {@code Image} to draw
+	 * @param biFunction a {@code BiFunction} that returns a {@code Color} based on its two parameters, the {@code Color} of this {@code Image} instance and the {@code Color} of {@code image}
+	 * @throws NullPointerException thrown if, and only if, either {@code image} or {@code biFunction} are {@code null} or {@code biFunction.apply(colorA, colorB)} returns {@code null}
+	 */
+	public void drawImage(final int x, final int y, final Image image, final BiFunction<Color, Color, Color> biFunction) {
 //		Initialize Image A and Image B, where Image A is the Image to render to and Image B is the Image to render:
 		final Image imageA = this;
 		final Image imageB = Objects.requireNonNull(image, "image == null");
+		
+		Objects.requireNonNull(biFunction, "biFunction == null");
 		
 //		Initialize the resolutions for Image A:
 		final int imageAResolutionX = imageA.resolutionX;
@@ -576,8 +607,12 @@ public final class Image {
 				final int imageAIndex = imageAY * imageAResolutionX + imageAX;
 				final int imageBIndex = imageBY * imageBResolutionX + imageBX;
 				
+				final Color colorA = imageA.colors[imageAIndex];
+				final Color colorB = imageB.colors[imageBIndex];
+				final Color colorR = Objects.requireNonNull(biFunction.apply(colorA, colorB));
+				
 //				Retrieve the current Color and sample count from Image B and draw it to Image A:
-				imageA.colors[imageAIndex] = imageB.colors[imageBIndex];
+				imageA.colors[imageAIndex] = colorR;
 				imageA.sampleCounts[imageAIndex] = imageB.sampleCounts[imageBIndex];
 			}
 		}
