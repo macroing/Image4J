@@ -27,6 +27,10 @@ final class Floats {
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	public static float exp(final float a) {
+		return (float)(Math.exp(a));
+	}
+	
 	public static float lerp(final float a, final float b, final float t) {
 		return (1.0F - t) * a + t * b;
 	}
@@ -49,6 +53,10 @@ final class Floats {
 	
 	public static float nextFloat() {
 		return ThreadLocalRandom.current().nextFloat();
+	}
+	
+	public static float pow(final float base, final float exponent) {
+		return (float)(Math.pow(base, exponent));
 	}
 	
 	public static float requireFiniteFloatValue(final float value, final String variableName) {

@@ -108,6 +108,29 @@ public final class Image {
 		Arrays.fill(this.colors, Objects.requireNonNull(color, "color == null"));
 	}
 	
+	/**
+	 * Constructs a new {@code Image} instance filled with {@code Color}s from the array {@code colors}.
+	 * <p>
+	 * If either {@code resolutionX}, {@code resolutionY} or {@code resolutionX * resolutionY} are less than {@code 0}, or {@code resolutionX * resolutionY != colors.length}, an {@code IllegalArgumentException} will be thrown.
+	 * <p>
+	 * If either {@code colors} or at least one of its elements are {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * The array {@code colors} will be cloned.
+	 * 
+	 * @param resolutionX the resolution of the X-axis
+	 * @param resolutionY the resolution of the Y-axis
+	 * @param colors the {@link Color}s to fill the {@code Image} with
+	 * @throws IllegalArgumentException thrown if, and only if, either {@code resolutionX}, {@code resolutionY} or {@code resolutionX * resolutionY} are less than {@code 0}, or {@code resolutionX * resolutionY != colors.length}
+	 * @throws NullPointerException thrown if, and only if, either {@code colors} or at least one of its elements are {@code null}
+	 */
+	public Image(final int resolutionX, final int resolutionY, final Color[] colors) {
+		this.resolutionX = Integers.requirePositiveIntValue(resolutionX, "resolutionX");
+		this.resolutionY = Integers.requirePositiveIntValue(resolutionY, "resolutionY");
+		this.resolution = Integers.requirePositiveIntValue(this.resolutionX * this.resolutionY, "(resolutionX * resolutionY)");
+		this.colors = Arrays2.requireExactLength(Arrays2.requireDeepNonNull(colors, "colors"), this.resolution, "colors").clone();
+		this.sampleCounts = new int[this.resolution];
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**

@@ -18,6 +18,8 @@
  */
 package org.macroing.image4j;
 
+import static org.macroing.image4j.Floats.exp;
+
 import java.util.Objects;
 
 /**
@@ -653,6 +655,80 @@ public final class Color {
 	}
 	
 	/**
+	 * Redoes gamma correction on this {@code Color} instance using {@code RGBColorSpace.SRGB}.
+	 * <p>
+	 * Returns a new {@code Color} instance with gamma correction redone.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * color.redoGammaCorrection(RGBColorSpace.SRGB);
+	 * }
+	 * </pre>
+	 * 
+	 * @return a new {@code Color} instance with gamma correction redone
+	 */
+	public Color redoGammaCorrection() {
+		return redoGammaCorrection(RGBColorSpace.SRGB);
+	}
+	
+	/**
+	 * Redoes gamma correction on this {@code Color} instance using {@code colorSpace}.
+	 * <p>
+	 * Returns a new {@code Color} instance with gamma correction redone.
+	 * <p>
+	 * If {@code colorSpace} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param colorSpace the {@link RGBColorSpace} to use
+	 * @return a new {@code Color} instance with gamma correction redone
+	 * @throws NullPointerException thrown if, and only if, {@code colorSpace} is {@code null}
+	 */
+	public Color redoGammaCorrection(final RGBColorSpace colorSpace) {
+		final float r = colorSpace.redoGammaCorrection(this.r);
+		final float g = colorSpace.redoGammaCorrection(this.g);
+		final float b = colorSpace.redoGammaCorrection(this.b);
+		final float a = this.a;
+		
+		return new Color(r, g, b, a);
+	}
+	
+	/**
+	 * Saturates this {@code Color} instance, such that each component value will lie in the range {@code [0.0F, 1.0F]}.
+	 * <p>
+	 * Returns a new {@code Color} instance with the result of the saturation.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * color.saturate(0.0F, 1.0F);
+	 * }
+	 * </pre>
+	 * 
+	 * @return a new {@code Color} instance with the result of the saturation
+	 */
+	public Color saturate() {
+		return saturate(0.0F, 1.0F);
+	}
+	
+	/**
+	 * Saturates this {@code Color} instance, such that each component value will lie in the range {@code [min(edgeA, edgeB), max(edgeA, edgeB)]}.
+	 * <p>
+	 * Returns a new {@code Color} instance with the result of the saturation.
+	 * 
+	 * @param edgeA the minimum or maximum value
+	 * @param edgeB the maximum or minimum value
+	 * @return a new {@code Color} instance with the result of the saturation
+	 */
+	public Color saturate(final float edgeA, final float edgeB) {
+		final float r = Floats.saturate(this.r, edgeA, edgeB);
+		final float g = Floats.saturate(this.g, edgeA, edgeB);
+		final float b = Floats.saturate(this.b, edgeA, edgeB);
+		final float a = this.a;
+		
+		return new Color(r, g, b, a);
+	}
+	
+	/**
 	 * Returns a new sepia {@code Color} instance based on this {@code Color} instance.
 	 * 
 	 * @return a new sepia {@code Color} instance based on this {@code Color} instance
@@ -728,6 +804,239 @@ public final class Color {
 	 */
 	public Color subtract(final float r, final float g, final float b) {
 		return new Color(this.r - r, this.g - g, this.b - b, this.a);
+	}
+	
+	/**
+	 * Applies an ACES filmic curve tone mapping operator to this {@code Color} instance.
+	 * <p>
+	 * Returns a new {@code Color} instance with the result of the tone mapping operation.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * color.toneMappingFilmicCurve(exposure, a, b, c, d, e, 0.0F, Float.MIN_VALUE)
+	 * }
+	 * </pre>
+	 * 
+	 * @param exposure the exposure to use
+	 * @param a a {@code float} value
+	 * @param b a {@code float} value
+	 * @param c a {@code float} value
+	 * @param d a {@code float} value
+	 * @param e a {@code float} value
+	 * @return a new {@code Color} instance with the result of the tone mapping operation
+	 */
+	public Color toneMappingFilmicCurve(final float exposure, final float a, final float b, final float c, final float d, final float e) {
+		return toneMappingFilmicCurve(exposure, a, b, c, d, e, 0.0F, Float.MIN_VALUE);
+	}
+	
+	/**
+	 * Applies an ACES filmic curve tone mapping operator to this {@code Color} instance.
+	 * <p>
+	 * Returns a new {@code Color} instance with the result of the tone mapping operation.
+	 * 
+	 * @param exposure the exposure to use
+	 * @param a a {@code float} value
+	 * @param b a {@code float} value
+	 * @param c a {@code float} value
+	 * @param d a {@code float} value
+	 * @param e a {@code float} value
+	 * @param subtract a value to subtract from each R-, G- and B component value before performing the tone mapping operation
+	 * @param minimum the minimum value allowed for each R-, G- and B component value
+	 * @return a new {@code Color} instance with the result of the tone mapping operation
+	 */
+	public Color toneMappingFilmicCurve(final float exposure, final float a, final float b, final float c, final float d, final float e, final float subtract, final float minimum) {
+		final float oldR = Floats.max(this.r * exposure - subtract, minimum);
+		final float oldG = Floats.max(this.g * exposure - subtract, minimum);
+		final float oldB = Floats.max(this.b * exposure - subtract, minimum);
+		final float oldA = this.a;
+		
+		final float newR = Floats.saturate((oldR * (a * oldR + b)) / (oldR * (c * oldR + d) + e));
+		final float newG = Floats.saturate((oldG * (a * oldG + b)) / (oldG * (c * oldG + d) + e));
+		final float newB = Floats.saturate((oldB * (a * oldB + b)) / (oldB * (c * oldB + d) + e));
+		final float newA = oldA;
+		
+		return new Color(newR, newG, newB, newA);
+	}
+	
+	/**
+	 * Applies a modified ACES filmic curve tone mapping operator to this {@code Color} instance.
+	 * <p>
+	 * Returns a new {@code Color} instance with the result of the tone mapping operation.
+	 * <p>
+	 * To use the original ACES filmic curve, set {@code exposure} to {@code 0.6F}.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * color.toneMappingFilmicCurve(exposure, 2.51F, 0.03F, 2.43F, 0.59F, 0.14F);
+	 * }
+	 * </pre>
+	 * 
+	 * @param exposure the exposure to use
+	 * @return a new {@code Color} instance with the result of the tone mapping operation
+	 */
+	public Color toneMappingFilmicCurveACES2(final float exposure) {
+//		Source: https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
+		return toneMappingFilmicCurve(exposure, 2.51F, 0.03F, 2.43F, 0.59F, 0.14F);
+	}
+	
+	/**
+	 * Applies a filmic curve tone mapping operator to this {@code Color} instance.
+	 * <p>
+	 * Returns a new {@code Color} instance with the result of the tone mapping operation.
+	 * <p>
+	 * This tone mapping operator also performs gamma correction with a gamma of 2.2. So, do not use gamma correction if this tone mapping operator is used.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * color.toneMappingFilmicCurve(exposure, 6.2F, 0.5F, 6.2F, 1.7F, 0.06F, 0.004F, 0.0F);
+	 * }
+	 * </pre>
+	 * 
+	 * @param exposure the exposure to use
+	 * @return a new {@code Color} instance with the result of the tone mapping operation
+	 */
+	public Color toneMappingFilmicCurveGammaCorrection22(final float exposure) {
+//		Source: http://filmicworlds.com/blog/why-a-filmic-curve-saturates-your-blacks/
+		return toneMappingFilmicCurve(exposure, 6.2F, 0.5F, 6.2F, 1.7F, 0.06F, 0.004F, 0.0F);
+	}
+	
+	/**
+	 * Applies a Reinhard tone mapping operator to this {@code Color} instance.
+	 * <p>
+	 * Returns a new {@code Color} instance with the result of the tone mapping operation.
+	 * 
+	 * @param exposure the exposure to use
+	 * @return a new {@code Color} instance with the result of the tone mapping operation
+	 */
+	public Color toneMappingReinhard(final float exposure) {
+//		Source: https://www.shadertoy.com/view/WdjSW3
+		
+		final float oldR = this.r * exposure;
+		final float oldG = this.g * exposure;
+		final float oldB = this.b * exposure;
+		final float oldA = this.a;
+		
+		final float newR = oldR / (1.0F + oldR);
+		final float newG = oldG / (1.0F + oldG);
+		final float newB = oldB / (1.0F + oldB);
+		final float newA = oldA;
+		
+		return new Color(newR, newG, newB, newA);
+	}
+	
+	/**
+	 * Applies a modified Reinhard tone mapping operator to this {@code Color} instance.
+	 * <p>
+	 * Returns a new {@code Color} instance with the result of the tone mapping operation.
+	 * 
+	 * @param exposure the exposure to use
+	 * @return a new {@code Color} instance with the result of the tone mapping operation
+	 */
+	public Color toneMappingReinhardModifiedV1(final float exposure) {
+//		Source: https://www.shadertoy.com/view/WdjSW3
+		
+		final float lWhite = 4.0F;
+		
+		final float oldR = this.r * exposure;
+		final float oldG = this.g * exposure;
+		final float oldB = this.b * exposure;
+		final float oldA = this.a;
+		
+		final float newR = oldR * (1.0F + oldR / (lWhite * lWhite)) / (1.0F + oldR);
+		final float newG = oldG * (1.0F + oldG / (lWhite * lWhite)) / (1.0F + oldG);
+		final float newB = oldB * (1.0F + oldB / (lWhite * lWhite)) / (1.0F + oldB);
+		final float newA = oldA;
+		
+		return new Color(newR, newG, newB, newA);
+	}
+	
+	/**
+	 * Applies a modified Reinhard tone mapping operator to this {@code Color} instance.
+	 * <p>
+	 * Returns a new {@code Color} instance with the result of the tone mapping operation.
+	 * 
+	 * @param exposure the exposure to use
+	 * @return a new {@code Color} instance with the result of the tone mapping operation
+	 */
+	public Color toneMappingReinhardModifiedV2(final float exposure) {
+		final float oldR = this.r * exposure;
+		final float oldG = this.g * exposure;
+		final float oldB = this.b * exposure;
+		final float oldA = this.a;
+		
+		final float newR = 1.0F - exp(-oldR * exposure);
+		final float newG = 1.0F - exp(-oldG * exposure);
+		final float newB = 1.0F - exp(-oldB * exposure);
+		final float newA = oldA;
+		
+		return new Color(newR, newG, newB, newA);
+	}
+	
+	/**
+	 * Applies an Unreal 3 tone mapping operator to this {@code Color} instance.
+	 * <p>
+	 * Returns a new {@code Color} instance with the result of the tone mapping operation.
+	 * <p>
+	 * This tone mapping operator also performs gamma correction with a gamma of 2.2. So, do not use gamma correction if this tone mapping operator is used.
+	 * 
+	 * @param exposure the exposure to use
+	 * @return a new {@code Color} instance with the result of the tone mapping operation
+	 */
+	public Color toneMappingUnreal3(final float exposure) {
+//		Source: https://www.shadertoy.com/view/WdjSW3
+		
+		final float oldR = this.r * exposure;
+		final float oldG = this.g * exposure;
+		final float oldB = this.b * exposure;
+		final float oldA = this.a;
+		
+		final float newR = oldR / (oldR + 0.155F) * 1.019F;
+		final float newG = oldG / (oldG + 0.155F) * 1.019F;
+		final float newB = oldB / (oldB + 0.155F) * 1.019F;
+		final float newA = oldA;
+		
+		return new Color(newR, newG, newB, newA);
+	}
+	
+	/**
+	 * Undoes gamma correction on this {@code Color} instance using {@code RGBColorSpace.SRGB}.
+	 * <p>
+	 * Returns a new {@code Color} instance with gamma correction undone.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * color.undoGammaCorrection(RGBColorSpace.SRGB);
+	 * }
+	 * </pre>
+	 * 
+	 * @return a new {@code Color} instance with gamma correction undone
+	 */
+	public Color undoGammaCorrection() {
+		return undoGammaCorrection(RGBColorSpace.SRGB);
+	}
+	
+	/**
+	 * Undoes gamma correction on this {@code Color} instance using {@code colorSpace}.
+	 * <p>
+	 * Returns a new {@code Color} instance with gamma correction undone.
+	 * <p>
+	 * If {@code colorSpace} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param colorSpace the {@link RGBColorSpace} to use
+	 * @return a new {@code Color} instance with gamma correction undone
+	 * @throws NullPointerException thrown if, and only if, {@code colorSpace} is {@code null}
+	 */
+	public Color undoGammaCorrection(final RGBColorSpace colorSpace) {
+		final float r = colorSpace.undoGammaCorrection(this.r);
+		final float g = colorSpace.undoGammaCorrection(this.g);
+		final float b = colorSpace.undoGammaCorrection(this.b);
+		final float a = this.a;
+		
+		return new Color(r, g, b, a);
 	}
 	
 	/**

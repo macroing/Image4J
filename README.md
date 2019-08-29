@@ -56,6 +56,22 @@ public class CropExample {
 }
 ```
 
+The following example creates two images, one empty and one random. Then it fills the empty image with a circle, draws the random image to the empty image and saves the result to your hard drive.
+```java
+import org.macroing.image4j.Color;
+import org.macroing.image4j.Image;
+
+public class FillAndDrawExample {
+    public static void main(String[] args) {
+        Image image_0 = Image.random(50, 50);
+        
+        Image image = new Image(150, 150);
+        image.fillCircle(75, 75, 50, Color.RED);
+        image.drawImage(50, 50, image_0);
+        image.save("Image-Result.png");
+}
+```
+
 The following example loads an image from your hard drive, updates it with a function and saves the result to your hard drive.
 ```java
 import org.macroing.image4j.Color;
