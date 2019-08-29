@@ -1,0 +1,20 @@
+Color:
+	* ADD:		Add support for various types of alpha blending operations.
+
+ConvolutionKernel33:
+	* CHANGE:	Check that BOX_BLUR works as expected and change it if it does not.
+	* CHANGE:	Check that EDGE_DETECTION works as expected and change it if it does not.
+	* CHANGE:	Check that EMBOSS works as expected and change it if it does not.
+	* CHANGE:	Check that GAUSSIAN_BLUR works as expected and change it if it does not.
+	* CHANGE:	Check that GRADIENT_HORIZONTAL works as expected and change it if it does not.
+	* CHANGE:	Check that GRADIENT_VERTICAL works as expected and change it if it does not.
+	* CHANGE:	Check that SHARPEN works as expected and change it if it does not.
+
+ConvolutionKernel55:
+	* CHANGE:	Check that GAUSSIAN_BLUR works as expected and change it if it does not.
+	* CHANGE:	Check that UNSHARP_MASKING works as expected and change it if it does not.
+
+Image:
+	* ADD:		Add Javadocs to addColorSample(int, Color).
+	* ADD:		Add Javadocs to addColorSample(int, int, Color).
+	* ADD:		Implement fillTriangle(int, int, int, int, int, int, Color).

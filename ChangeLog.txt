@@ -1,0 +1,15 @@
+2019-08-29  Jörgen Lundgren  <joergen.lundgren@macroing.org>
+
+	* ADD:		Add a new TODO.txt file that will contain a list of things to do.
+	* ADD:		Add this ChangeLog.txt file to keep track of the progress.
+	* ADD:		Add support for changing the resolution of an instance of the Image class.
+	* ADD:		Add a new ConvolutionKernel55 class and a multiply(ConvolutionKernel55) method to the Image class.
+	* ADD:		Add a new drawImage(int, int, Image, BiFunction) method to the Image class, that allows for different types of blending.
+	* ADD:		Add support for various tone mapping operators. These include a few different filmic curve and Reinhard implementations.
+	* ADD:		Add support for gamma correction using different RGB color spaces.
+	* CHANGE:	Change the drawImage(int, int, Image) method of the Image class to support simple alpha blending.
+
+2019-08-28  Jörgen Lundgren  <joergen.lundgren@macroing.org>
+
+	* ADD:		Add support for building the project with Apache Ant.
+	* ADD:		Add the entire library.
