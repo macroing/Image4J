@@ -19,8 +19,8 @@
 package org.macroing.image4j;
 
 import static org.macroing.image4j.Floats.pow;
-import static org.macroing.image4j.Integers.castFloatToInt;
 import static org.macroing.image4j.Integers.saturate;
+import static org.macroing.image4j.Integers.toInt;
 
 /**
  * An {@code RGBColorSpace} is an RGB color space.
@@ -262,7 +262,7 @@ public final class RGBColorSpace {
 		final int[] gammaCurve = new int[256];
 		
 		for(int i = 0; i < 256; i++) {
-			gammaCurve[i] = saturate(castFloatToInt(redoGammaCorrection(i / 255.0F) * 255.0F + 0.5F));
+			gammaCurve[i] = saturate(toInt(redoGammaCorrection(i / 255.0F) * 255.0F + 0.5F));
 		}
 		
 		return gammaCurve;
@@ -272,7 +272,7 @@ public final class RGBColorSpace {
 		final int[] gammaCurveReciprocal = new int[256];
 		
 		for(int i = 0; i < 256; i++) {
-			gammaCurveReciprocal[i] = saturate(castFloatToInt(undoGammaCorrection(i / 255.0F) * 255.0F + 0.5F));
+			gammaCurveReciprocal[i] = saturate(toInt(undoGammaCorrection(i / 255.0F) * 255.0F + 0.5F));
 		}
 		
 		return gammaCurveReciprocal;

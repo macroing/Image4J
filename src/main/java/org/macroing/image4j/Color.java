@@ -19,6 +19,7 @@
 package org.macroing.image4j;
 
 import static org.macroing.image4j.Floats.exp;
+import static org.macroing.image4j.Integers.toInt;
 
 import java.util.Objects;
 
@@ -1435,6 +1436,6 @@ public final class Color {
 	}
 	
 	private static int doConvertComponentValueFromFloatToInt(final float componentValue) {
-		return Integers.castFloatToInt(Floats.saturate(componentValue) * 255.0F + 0.5F);
+		return toInt(Floats.saturate(componentValue) * 255.0F + 0.5F);
 	}
 }

@@ -18,3 +18,4 @@ Image:
 	* ADD:		Add Javadocs to addColorSample(int, Color).
 	* ADD:		Add Javadocs to addColorSample(int, int, Color).
 	* ADD:		Implement fillTriangle(int, int, int, int, int, int, Color).
+	* ADD:		Add methods to perform rotations using an Angle.

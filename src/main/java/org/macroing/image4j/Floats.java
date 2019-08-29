@@ -21,14 +21,27 @@ package org.macroing.image4j;
 import java.util.concurrent.ThreadLocalRandom;
 
 final class Floats {
+	public static final float PI = toFloat(Math.PI);
+	public static final float PI_MULTIPLIED_BY_TWO = PI * 2.0F;
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	private Floats() {
 		
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	public static float abs(final float a) {
+		return toFloat(Math.abs(a));
+	}
+	
 	public static float exp(final float a) {
-		return (float)(Math.exp(a));
+		return toFloat(Math.exp(a));
+	}
+	
+	public static float floor(final float a) {
+		return toFloat(Math.floor(a));
 	}
 	
 	public static float lerp(final float a, final float b, final float t) {
@@ -56,7 +69,7 @@ final class Floats {
 	}
 	
 	public static float pow(final float base, final float exponent) {
-		return (float)(Math.pow(base, exponent));
+		return toFloat(Math.pow(base, exponent));
 	}
 	
 	public static float requireFiniteFloatValue(final float value, final String variableName) {
@@ -78,5 +91,34 @@ final class Floats {
 		final float maximumValue = edgeA > edgeB ? edgeA : edgeB;
 		
 		return value < minimumValue ? minimumValue : value > maximumValue ? maximumValue : value;
+	}
+	
+	public static float toDegrees(final float angleInRadians) {
+		return toFloat(Math.toDegrees(angleInRadians));
+	}
+	
+	public static float toFloat(final double value) {
+		return (float)(value);
+	}
+	
+	public static float toRadians(final float angleInDegrees) {
+		return toFloat(Math.toRadians(angleInDegrees));
+	}
+	
+	public static float wrapAround(final float value, final float a, final float b) {
+		final float minimumValue = min(a, b);
+		final float maximumValue = max(a, b);
+		
+		float currentValue = value;
+		
+		while(currentValue < minimumValue || currentValue > maximumValue) {
+			if(currentValue < minimumValue) {
+				currentValue = maximumValue - (minimumValue - currentValue);
+			} else if(currentValue > maximumValue) {
+				currentValue = minimumValue + (currentValue - maximumValue);
+			}
+		}
+		
+		return currentValue;
 	}
 }

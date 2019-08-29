@@ -1,3 +1,7 @@
+2019-08-30  Jörgen Lundgren  <joergen.lundgren@macroing.org>
+
+	* ADD:		Add a new NoiseGenerator class that can generate noise based on the Perlin- and Simplex noise algorithms.
+
 2019-08-29  Jörgen Lundgren  <joergen.lundgren@macroing.org>
 
 	* ADD:		Add a new TODO.txt file that will contain a list of things to do.

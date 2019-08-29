@@ -18,41 +18,33 @@
  */
 package org.macroing.image4j;
 
-final class Integers {
-	private Integers() {
+import java.text.DecimalFormat;
+
+final class Strings {
+	private static final DecimalFormat DECIMAL_FORMAT = doCreateDecimalFormat();
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private Strings() {
 		
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public static int abs(final int a) {
-		return Math.abs(a);
+	public static String toNonScientificNotation(final float value) {
+		return DECIMAL_FORMAT.format(value).replace(',', '.');
 	}
 	
-	public static int toInt(final float value) {
-		return (int)(value);
-	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public static int modulo(final int x, final int n) {
-		return x < 0 ? (x % n + n) % n : x % n;
-	}
-	
-	public static int requirePositiveIntValue(final int value, final String variableName) {
-		if(value < 0) {
-			throw new IllegalArgumentException(String.format("%s < 0: %s=%s", variableName, variableName, Integer.toString(value)));
-		}
+	private static DecimalFormat doCreateDecimalFormat() {
+		final
+		DecimalFormat decimalFormat = new DecimalFormat("#");
+		decimalFormat.setDecimalSeparatorAlwaysShown(true);
+		decimalFormat.setMaximumFractionDigits(8);
+		decimalFormat.setMinimumFractionDigits(1);
+		decimalFormat.setMinimumIntegerDigits(1);
 		
-		return value;
-	}
-	
-	public static int saturate(final int value) {
-		return saturate(value, 0, 255);
-	}
-	
-	public static int saturate(final int value, final int edgeA, final int edgeB) {
-		final int minimumValue = edgeA < edgeB ? edgeA : edgeB;
-		final int maximumValue = edgeA > edgeB ? edgeA : edgeB;
-		
-		return value < minimumValue ? minimumValue : value > maximumValue ? maximumValue : value;
+		return decimalFormat;
 	}
 }
