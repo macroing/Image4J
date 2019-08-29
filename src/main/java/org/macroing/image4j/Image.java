@@ -44,11 +44,11 @@ import javax.imageio.ImageIO;
  * @author J&#246;rgen Lundgren
  */
 public final class Image {
-	private final Color[] colors;
-	private final int resolution;
-	private final int resolutionX;
-	private final int resolutionY;
-	private final int[] sampleCounts;
+	private Color[] colors;
+	private int resolution;
+	private int resolutionX;
+	private int resolutionY;
+	private int[] sampleCounts;
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -102,7 +102,7 @@ public final class Image {
 	public Image(final int resolutionX, final int resolutionY, final Color color) {
 		this.resolutionX = Integers.requirePositiveIntValue(resolutionX, "resolutionX");
 		this.resolutionY = Integers.requirePositiveIntValue(resolutionY, "resolutionY");
-		this.resolution = Integers.requirePositiveIntValue(this.resolutionX * this.resolutionY, "(resolutionX * resolutionY)");
+		this.resolution = Integers.requirePositiveIntValue(resolutionX * resolutionY, "(resolutionX * resolutionY)");
 		this.colors = new Color[this.resolution];
 		this.sampleCounts = new int[this.resolution];
 		
@@ -983,6 +983,68 @@ public final class Image {
 	}
 	
 	/**
+	 * Multiplies this {@code Image} instance with {@code convolutionKernel}.
+	 * <p>
+	 * If {@code convolutionKernel} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param convolutionKernel a {@link ConvolutionKernel55}
+	 * @throws NullPointerException thrown if, and only if, {@code convolutionKernel} is {@code null}
+	 */
+	public void multiply(final ConvolutionKernel55 convolutionKernel) {
+		final Color factor = new Color(convolutionKernel.factor);
+		final Color bias = new Color(convolutionKernel.bias);
+		
+		final Image image = copy();
+		
+		for(int y = 0; y < this.resolutionY; y++) {
+			for(int x = 0; x < this.resolutionX; x++) {
+				Color color = Color.BLACK;
+				
+//				Row #0:
+				color = color.add(image.doGetColorOrDefault(x + -2, y + -2, Color.BLACK).multiply(convolutionKernel.element00));
+				color = color.add(image.doGetColorOrDefault(x + -1, y + -2, Color.BLACK).multiply(convolutionKernel.element01));
+				color = color.add(image.doGetColorOrDefault(x + +0, y + -2, Color.BLACK).multiply(convolutionKernel.element02));
+				color = color.add(image.doGetColorOrDefault(x + +1, y + -2, Color.BLACK).multiply(convolutionKernel.element03));
+				color = color.add(image.doGetColorOrDefault(x + +2, y + -2, Color.BLACK).multiply(convolutionKernel.element04));
+				
+//				Row #1:
+				color = color.add(image.doGetColorOrDefault(x + -2, y + -1, Color.BLACK).multiply(convolutionKernel.element10));
+				color = color.add(image.doGetColorOrDefault(x + -1, y + -1, Color.BLACK).multiply(convolutionKernel.element11));
+				color = color.add(image.doGetColorOrDefault(x + +0, y + -1, Color.BLACK).multiply(convolutionKernel.element12));
+				color = color.add(image.doGetColorOrDefault(x + +1, y + -1, Color.BLACK).multiply(convolutionKernel.element13));
+				color = color.add(image.doGetColorOrDefault(x + +2, y + -1, Color.BLACK).multiply(convolutionKernel.element14));
+				
+//				Row #2:
+				color = color.add(image.doGetColorOrDefault(x + -2, y + +0, Color.BLACK).multiply(convolutionKernel.element20));
+				color = color.add(image.doGetColorOrDefault(x + -1, y + +0, Color.BLACK).multiply(convolutionKernel.element21));
+				color = color.add(image.doGetColorOrDefault(x + +0, y + +0, Color.BLACK).multiply(convolutionKernel.element22));
+				color = color.add(image.doGetColorOrDefault(x + +1, y + +0, Color.BLACK).multiply(convolutionKernel.element23));
+				color = color.add(image.doGetColorOrDefault(x + +2, y + +0, Color.BLACK).multiply(convolutionKernel.element24));
+				
+//				Row #3:
+				color = color.add(image.doGetColorOrDefault(x + -2, y + +1, Color.BLACK).multiply(convolutionKernel.element30));
+				color = color.add(image.doGetColorOrDefault(x + -1, y + +1, Color.BLACK).multiply(convolutionKernel.element31));
+				color = color.add(image.doGetColorOrDefault(x + +0, y + +1, Color.BLACK).multiply(convolutionKernel.element32));
+				color = color.add(image.doGetColorOrDefault(x + +1, y + +1, Color.BLACK).multiply(convolutionKernel.element33));
+				color = color.add(image.doGetColorOrDefault(x + +2, y + +1, Color.BLACK).multiply(convolutionKernel.element34));
+				
+//				Row #4:
+				color = color.add(image.doGetColorOrDefault(x + -2, y + +2, Color.BLACK).multiply(convolutionKernel.element40));
+				color = color.add(image.doGetColorOrDefault(x + -1, y + +2, Color.BLACK).multiply(convolutionKernel.element41));
+				color = color.add(image.doGetColorOrDefault(x + +0, y + +2, Color.BLACK).multiply(convolutionKernel.element42));
+				color = color.add(image.doGetColorOrDefault(x + +1, y + +2, Color.BLACK).multiply(convolutionKernel.element43));
+				color = color.add(image.doGetColorOrDefault(x + +2, y + +2, Color.BLACK).multiply(convolutionKernel.element44));
+				
+//				Multiply with the factor and add the bias:
+				color = color.multiply(factor).add(bias);
+				color = color.minTo0().maxTo1();
+				
+				doSetColor(x, y, color);
+			}
+		}
+	}
+	
+	/**
 	 * Saves this {@code Image} as a .PNG image to the file represented by {@code file}.
 	 * <p>
 	 * If {@code file} is {@code null}, a {@code NullPointerException} will be thrown.
@@ -1047,6 +1109,81 @@ public final class Image {
 	 */
 	public void setColor(final int x, final int y, final Color color) {
 		doSetColorWrapAround(x, y, Objects.requireNonNull(color, "color == null"));
+	}
+	
+	/**
+	 * Sets the resolution of this {@code Image} instance.
+	 * <p>
+	 * The {@link Color}s in the region of the old boundaries that are inside the region of the new boundaries will be preserved. The others will be discarded. If the new boundaries of this {@code Image} instance is larger than the old
+	 * boundaries, the regions outside the old boundaries will be filled with {@code Color.BLACK}.
+	 * <p>
+	 * If either {@code resolutionX} is less than {@code 0}, {@code resolutionY} is less than {@code 0} or {@code resolutionX * resolutionY} is less than {@code 0}, an {@code IllegalArgumentException} will be thrown.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.setResolution(resolutionX, resolutionY, Color.BLACK);
+	 * }
+	 * </pre>
+	 * 
+	 * @param resolutionX the resolution of the X-axis
+	 * @param resolutionY the resolution of the Y-axis
+	 * @throws IllegalArgumentException thrown if, and only if, either {@code resolutionX} is less than {@code 0}, {@code resolutionY} is less than {@code 0} or {@code resolutionX * resolutionY} is less than {@code 0}
+	 */
+	public void setResolution(final int resolutionX, final int resolutionY) {
+		setResolution(resolutionX, resolutionY, Color.BLACK);
+	}
+	
+	/**
+	 * Sets the resolution of this {@code Image} instance.
+	 * <p>
+	 * The {@link Color}s in the region of the old boundaries that are inside the region of the new boundaries will be preserved. The others will be discarded. If the new boundaries of this {@code Image} instance is larger than the old
+	 * boundaries, the regions outside the old boundaries will be filled with {@code color}.
+	 * <p>
+	 * If either {@code resolutionX} is less than {@code 0}, {@code resolutionY} is less than {@code 0} or {@code resolutionX * resolutionY} is less than {@code 0}, an {@code IllegalArgumentException} will be thrown.
+	 * <p>
+	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param resolutionX the resolution of the X-axis
+	 * @param resolutionY the resolution of the Y-axis
+	 * @param color the {@code Color} to fill the regions of the {@code Image} that are outside the old boundaries
+	 * @throws IllegalArgumentException thrown if, and only if, either {@code resolutionX} is less than {@code 0}, {@code resolutionY} is less than {@code 0} or {@code resolutionX * resolutionY} is less than {@code 0}
+	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
+	 */
+	public void setResolution(final int resolutionX, final int resolutionY, final Color color) {
+		final int oldResolutionX = this.resolutionX;
+		final int oldResolutionY = this.resolutionY;
+		
+		final Color[] oldColors = this.colors;
+		
+		final int[] oldSampleCounts = this.sampleCounts;
+		
+		final int newResolutionX = Integers.requirePositiveIntValue(resolutionX, "resolutionX");
+		final int newResolutionY = Integers.requirePositiveIntValue(resolutionY, "resolutionY");
+		final int newResolution = Integers.requirePositiveIntValue(resolutionX * resolutionY, "(resolutionX * resolutionY)");
+		
+		final Color[] newColors = new Color[newResolution];
+		
+		final int[] newSampleCounts = new int[newResolution];
+		
+		Arrays.fill(newColors, Objects.requireNonNull(color, "color == null"));
+		
+		final int minimumResolutionX = min(oldResolutionX, newResolutionX);
+		final int minimumResolutionY = min(oldResolutionY, newResolutionY);
+		
+		for(int y = 0; y < minimumResolutionY; y++) {
+			final int oldIndex = y * oldResolutionX + 0;
+			final int newIndex = y * newResolutionX + 0;
+			
+			System.arraycopy(oldColors, oldIndex, newColors, newIndex, minimumResolutionX);
+			System.arraycopy(oldSampleCounts, oldIndex, newSampleCounts, newIndex, minimumResolutionX);
+		}
+		
+		this.resolution = newResolution;
+		this.resolutionX = newResolutionX;
+		this.resolutionY = newResolutionY;
+		this.colors = newColors;
+		this.sampleCounts = newSampleCounts;
 	}
 	
 	/**

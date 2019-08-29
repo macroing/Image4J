@@ -69,6 +69,8 @@ public final class ConvolutionKernel33 {
 	
 	/**
 	 * The bias associated with this {@code ConvolutionKernel33} instance.
+	 * <p>
+	 * This is the same as Offset in Gimp.
 	 */
 	public final float bias;
 	
@@ -119,6 +121,8 @@ public final class ConvolutionKernel33 {
 	
 	/**
 	 * The factor associated with this {@code ConvolutionKernel33} instance.
+	 * <p>
+	 * This is the same as the reciprocal value of the Divisor in Gimp.
 	 */
 	public final float factor;
 	
@@ -200,7 +204,19 @@ public final class ConvolutionKernel33 {
 	 */
 	@Override
 	public String toString() {
-		return String.format("new ConvolutionKernel33(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", Float.toString(this.element00), Float.toString(this.element01), Float.toString(this.element02), Float.toString(this.element10), Float.toString(this.element11), Float.toString(this.element12), Float.toString(this.element20), Float.toString(this.element21), Float.toString(this.element22), Float.toString(this.factor), Float.toString(this.bias));
+		final String element00 = Float.toString(this.element00);
+		final String element01 = Float.toString(this.element01);
+		final String element02 = Float.toString(this.element02);
+		final String element10 = Float.toString(this.element10);
+		final String element11 = Float.toString(this.element11);
+		final String element12 = Float.toString(this.element12);
+		final String element20 = Float.toString(this.element20);
+		final String element21 = Float.toString(this.element21);
+		final String element22 = Float.toString(this.element22);
+		final String factor = Float.toString(this.factor);
+		final String bias = Float.toString(this.bias);
+		
+		return String.format("new ConvolutionKernel33(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", element00, element01, element02, element10, element11, element12, element20, element21, element22, factor, bias);
 	}
 	
 	/**
@@ -246,20 +262,13 @@ public final class ConvolutionKernel33 {
 	
 	/**
 	 * Returns the bias associated with this {@code ConvolutionKernel33} instance.
+	 * <p>
+	 * This is the same as Offset in Gimp.
 	 * 
 	 * @return the bias associated with this {@code ConvolutionKernel33} instance
 	 */
 	public float getBias() {
 		return this.bias;
-	}
-	
-	/**
-	 * Returns the factor associated with this {@code ConvolutionKernel33} instance.
-	 * 
-	 * @return the factor associated with this {@code ConvolutionKernel33} instance
-	 */
-	public float getFactor() {
-		return this.factor;
 	}
 	
 	/**
@@ -344,13 +353,40 @@ public final class ConvolutionKernel33 {
 	}
 	
 	/**
+	 * Returns the factor associated with this {@code ConvolutionKernel33} instance.
+	 * <p>
+	 * This is the same as the reciprocal value of the Divisor in Gimp.
+	 * 
+	 * @return the factor associated with this {@code ConvolutionKernel33} instance
+	 */
+	public float getFactor() {
+		return this.factor;
+	}
+	
+	/**
 	 * Returns a hash code for this {@code ConvolutionKernel33} instance.
 	 * 
 	 * @return a hash code for this {@code ConvolutionKernel33} instance
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(Float.valueOf(this.bias), Float.valueOf(this.element00), Float.valueOf(this.element01), Float.valueOf(this.element02), Float.valueOf(this.element10), Float.valueOf(this.element11), Float.valueOf(this.element12), Float.valueOf(this.element20), Float.valueOf(this.element21), Float.valueOf(this.element22), Float.valueOf(this.factor));
+		final Float bias = Float.valueOf(this.bias);
+		
+		final Float element00 = Float.valueOf(this.element00);
+		final Float element01 = Float.valueOf(this.element01);
+		final Float element02 = Float.valueOf(this.element02);
+		
+		final Float element10 = Float.valueOf(this.element10);
+		final Float element11 = Float.valueOf(this.element11);
+		final Float element12 = Float.valueOf(this.element12);
+		
+		final Float element20 = Float.valueOf(this.element20);
+		final Float element21 = Float.valueOf(this.element21);
+		final Float element22 = Float.valueOf(this.element22);
+		
+		final Float factor = Float.valueOf(this.factor);
+		
+		return Objects.hash(bias, element00, element01, element02, element10, element11, element12, element20, element21, element22, factor);
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
