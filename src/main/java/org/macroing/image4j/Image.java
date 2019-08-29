@@ -525,7 +525,7 @@ public final class Image {
 	 * <p>
 	 * If {@code image} is {@code null}, a {@code NullPointerException} will be thrown.
 	 * <p>
-	 * This method currently performs a simple Alpha blending operation. See the code below. It might change in the future.
+	 * This method currently performs a simple alpha blending operation. See the code below. It might change in the future.
 	 * <p>
 	 * Calling this method is equivalent to the following:
 	 * <pre>
