@@ -67,7 +67,9 @@ public class FillAndDrawExample {
         
         Image image = new Image(150, 150);
         image.fillCircle(75, 75, 50, Color.RED);
+//      The two methods below are equivalent:
         image.drawImage(50, 50, image_0);
+//      image.drawImage(50, 50, image_0, (colorA, colorB) -> Color.blend(colorA, colorB, colorB.a));
         image.save("Image-Result.png");
 }
 ```
