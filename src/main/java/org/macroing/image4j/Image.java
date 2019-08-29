@@ -905,6 +905,8 @@ public final class Image {
 	 * Only the parts of the triangle that are inside the boundaries of this {@code Image} instance will be filled.
 	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * Note: This method has not been implemented yet!
 	 * 
 	 * @param aX the X-coordinate of the point {@code A}
 	 * @param aY the Y-coordinate of the point {@code A}
