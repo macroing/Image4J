@@ -433,12 +433,39 @@ public final class Image {
 		return intArray;
 	}
 	
-//	TODO: Add Javadocs!
+	/**
+	 * Adds {@code color} as a sample at the pixel represented by {@code index}.
+	 * <p>
+	 * If {@code index} is less than {@code 0} or greater than or equal to {@link #getResolution()}, {@code index} will be wrapped around.
+	 * <p>
+	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * See the documentation for {@link Color#addSample(Color, int)} to get a more detailed explanation for how this method works.
+	 * 
+	 * @param index the index of the pixel where {@code color} should be added as a sample
+	 * @param color the {@link Color} to add as a sample
+	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
+	 */
 	public void addColorSample(final int index, final Color color) {
 		doAddColorSampleWrapAround(index, Objects.requireNonNull(color, "color == null"));
 	}
 	
-//	TODO: Add Javadocs!
+	/**
+	 * Adds {@code color} as a sample at the pixel represented by {@code x} and {@code y}.
+	 * <p>
+	 * If {@code x} is less than {@code 0} or greater than or equal to {@link #getResolutionX()}, {@code x} will be wrapped around.
+	 * <p>
+	 * If {@code y} is less than {@code 0} or greater than or equal to {@link #getResolutionY()}, {@code y} will be wrapped around.
+	 * <p>
+	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * See the documentation for {@link Color#addSample(Color, int)} to get a more detailed explanation for how this method works.
+	 * 
+	 * @param x the X-coordinate of the pixel where {@code color} should be added as a sample
+	 * @param y the Y-coordinate of the pixel where {@code color} should be added as a sample
+	 * @param color the {@link Color} to add as a sample
+	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
+	 */
 	public void addColorSample(final int x, final int y, final Color color) {
 		doAddColorSampleWrapAround(x, y, Objects.requireNonNull(color, "color == null"));
 	}
@@ -1586,6 +1613,170 @@ public final class Image {
 		return image;
 	}
 	
+	/**
+	 * Returns an {@code Image} representation of {@code bufferedImage}.
+	 * <p>
+	 * If {@code bufferedImage} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param bufferedImage a {@code BufferedImage} instance
+	 * @return an {@code Image} representation of {@code bufferedImage}
+	 * @throws NullPointerException thrown if, and only if, {@code bufferedImage} is {@code null}
+	 */
+	public static Image toImage(final BufferedImage bufferedImage) {
+		final BufferedImage compatibleBufferedImage = doGetCompatibleBufferedImage(Objects.requireNonNull(bufferedImage, "bufferedImage == null"));
+		
+		final int resolutionX = compatibleBufferedImage.getWidth();
+		final int resolutionY = compatibleBufferedImage.getHeight();
+		
+		final Color[] colors = doConvertIntArrayToColorArray(DataBufferInt.class.cast(bufferedImage.getRaster().getDataBuffer()).getData());
+		
+		return new Image(resolutionX, resolutionY, colors);
+	}
+	
+	/**
+	 * Returns an {@code Image} representation of {@code array}.
+	 * <p>
+	 * If either {@code resolutionX}, {@code resolutionY} or {@code resolutionX * resolutionY} are less than {@code 0} or {@code array.length != resolutionX * resolutionY * 4}, an {@code IllegalArgumentException} will be thrown.
+	 * <p>
+	 * If {@code array} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * Image.toImage(resolutionX, resolutionY, array, ArrayComponentOrder.BGRA);
+	 * }
+	 * </pre>
+	 * 
+	 * @param resolutionX the resolution of the X-axis
+	 * @param resolutionY the resolution of the Y-axis
+	 * @param array a {@code byte[]} with {@code byte} values representing colors in unpacked form
+	 * @return an {@code Image} representation of {@code array}
+	 * @throws IllegalArgumentException thrown if, and only if, either {@code resolutionX}, {@code resolutionY} or {@code resolutionX * resolutionY} are less than {@code 0} or {@code array.length != resolutionX * resolutionY * 4}
+	 * @throws NullPointerException thrown if, and only if, {@code array} is {@code null}
+	 */
+	public static Image toImage(final int resolutionX, final int resolutionY, final byte[] array) {
+		return toImage(resolutionX, resolutionY, array, ArrayComponentOrder.BGRA);
+	}
+	
+	/**
+	 * Returns an {@code Image} representation of {@code array}.
+	 * <p>
+	 * If either {@code resolutionX}, {@code resolutionY} or {@code resolutionX * resolutionY} are less than {@code 0} or {@code array.length != resolutionX * resolutionY * arrayComponentOrder.getComponentCount()}, an {@code IllegalArgumentException}
+	 * will be thrown.
+	 * <p>
+	 * If either {@code array} or {@code arrayComponentOrder} are {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param resolutionX the resolution of the X-axis
+	 * @param resolutionY the resolution of the Y-axis
+	 * @param array a {@code byte[]} with {@code byte} values representing colors in unpacked form
+	 * @param arrayComponentOrder an {@link ArrayComponentOrder} to get the components from {@code array} in the correct order
+	 * @return an {@code Image} representation of {@code array}
+	 * @throws IllegalArgumentException thrown if, and only if, either {@code resolutionX}, {@code resolutionY} or {@code resolutionX * resolutionY} are less than {@code 0} or {@code array.length != resolutionX * resolutionY *
+	 * arrayComponentOrder.getComponentCount()}
+	 * @throws NullPointerException thrown if, and only if, either {@code array} or {@code arrayComponentOrder} are {@code null}
+	 */
+	public static Image toImage(final int resolutionX, final int resolutionY, final byte[] array, final ArrayComponentOrder arrayComponentOrder) {
+		Integers.requirePositiveIntValue(resolutionX, "resolutionX");
+		Integers.requirePositiveIntValue(resolutionY, "resolutionY");
+		Integers.requirePositiveIntValue(resolutionX * resolutionY, "(resolutionX * resolutionY)");
+		
+		Objects.requireNonNull(array, "array == null");
+		Objects.requireNonNull(arrayComponentOrder, "arrayComponentOrder == null");
+		
+		Arrays2.requireExactLength(Objects.requireNonNull(array, "array == null"), resolutionX * resolutionY * arrayComponentOrder.getComponentCount(), "array");
+		
+		final Color[] colors = doConvertByteArrayToColorArray(array, arrayComponentOrder);
+		
+		return new Image(resolutionX, resolutionY, colors);
+	}
+	
+	/**
+	 * Returns an {@code Image} representation of {@code array}.
+	 * <p>
+	 * If either {@code resolutionX}, {@code resolutionY} or {@code resolutionX * resolutionY} are less than {@code 0} or {@code array.length != resolutionX * resolutionY}, an {@code IllegalArgumentException} will be thrown.
+	 * <p>
+	 * If {@code array} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * Image.toImage(resolutionX, resolutionY, array, PackedIntComponentOrder.ARGB);
+	 * }
+	 * </pre>
+	 * 
+	 * @param resolutionX the resolution of the X-axis
+	 * @param resolutionY the resolution of the Y-axis
+	 * @param array an {@code int[]} with {@code int} values representing colors in packed form
+	 * @return an {@code Image} representation of {@code array}
+	 * @throws IllegalArgumentException thrown if, and only if, either {@code resolutionX}, {@code resolutionY} or {@code resolutionX * resolutionY} are less than {@code 0} or {@code array.length != resolutionX * resolutionY}
+	 * @throws NullPointerException thrown if, and only if, {@code array} is {@code null}
+	 */
+	public static Image toImage(final int resolutionX, final int resolutionY, final int[] array) {
+		return toImage(resolutionX, resolutionY, array, PackedIntComponentOrder.ARGB);
+	}
+	
+	/**
+	 * Returns an {@code Image} representation of {@code array}.
+	 * <p>
+	 * If either {@code resolutionX}, {@code resolutionY} or {@code resolutionX * resolutionY} are less than {@code 0} or {@code array.length != resolutionX * resolutionY * arrayComponentOrder.getComponentCount()}, an {@code IllegalArgumentException}
+	 * will be thrown.
+	 * <p>
+	 * If either {@code array} or {@code arrayComponentOrder} are {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param resolutionX the resolution of the X-axis
+	 * @param resolutionY the resolution of the Y-axis
+	 * @param array an {@code int[]} with {@code int} values representing colors in unpacked form
+	 * @param arrayComponentOrder an {@link ArrayComponentOrder} to get the components from {@code array} in the correct order
+	 * @return an {@code Image} representation of {@code array}
+	 * @throws IllegalArgumentException thrown if, and only if, either {@code resolutionX}, {@code resolutionY} or {@code resolutionX * resolutionY} are less than {@code 0} or {@code array.length != resolutionX * resolutionY *
+	 * arrayComponentOrder.getComponentCount()}
+	 * @throws NullPointerException thrown if, and only if, either {@code array} or {@code arrayComponentOrder} are {@code null}
+	 */
+	public static Image toImage(final int resolutionX, final int resolutionY, final int[] array, final ArrayComponentOrder arrayComponentOrder) {
+		Integers.requirePositiveIntValue(resolutionX, "resolutionX");
+		Integers.requirePositiveIntValue(resolutionY, "resolutionY");
+		Integers.requirePositiveIntValue(resolutionX * resolutionY, "(resolutionX * resolutionY)");
+		
+		Objects.requireNonNull(array, "array == null");
+		Objects.requireNonNull(arrayComponentOrder, "arrayComponentOrder == null");
+		
+		Arrays2.requireExactLength(array, resolutionX * resolutionY * arrayComponentOrder.getComponentCount(), "array");
+		
+		final Color[] colors = doConvertIntArrayToColorArray(array, arrayComponentOrder);
+		
+		return new Image(resolutionX, resolutionY, colors);
+	}
+	
+	/**
+	 * Returns an {@code Image} representation of {@code array}.
+	 * <p>
+	 * If either {@code resolutionX}, {@code resolutionY} or {@code resolutionX * resolutionY} are less than {@code 0} or {@code array.length != resolutionX * resolutionY}, an {@code IllegalArgumentException} will be thrown.
+	 * <p>
+	 * If either {@code array} or {@code packedIntComponentOrder} are {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param resolutionX the resolution of the X-axis
+	 * @param resolutionY the resolution of the Y-axis
+	 * @param array an {@code int[]} with {@code int} values representing colors in packed form
+	 * @param packedIntComponentOrder a {@link PackedIntComponentOrder} to get the components from the {@code int} values of {@code array} in the correct order
+	 * @return an {@code Image} representation of {@code array}
+	 * @throws IllegalArgumentException thrown if, and only if, either {@code resolutionX}, {@code resolutionY} or {@code resolutionX * resolutionY} are less than {@code 0} or {@code array.length != resolutionX * resolutionY}
+	 * @throws NullPointerException thrown if, and only if, either {@code array} or {@code packedIntComponentOrder} are {@code null}
+	 */
+	public static Image toImage(final int resolutionX, final int resolutionY, final int[] array, final PackedIntComponentOrder packedIntComponentOrder) {
+		Integers.requirePositiveIntValue(resolutionX, "resolutionX");
+		Integers.requirePositiveIntValue(resolutionY, "resolutionY");
+		Integers.requirePositiveIntValue(resolutionX * resolutionY, "(resolutionX * resolutionY)");
+		
+		Objects.requireNonNull(array, "array == null");
+		Objects.requireNonNull(packedIntComponentOrder, "packedIntComponentOrder == null");
+		
+		Arrays2.requireExactLength(array, resolutionX * resolutionY, "array");
+		
+		final Color[] colors = doConvertIntArrayToColorArray(array, packedIntComponentOrder);
+		
+		return new Image(resolutionX, resolutionY, colors);
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private Color doGetColorOrDefault(final int x, final int y, final Color color) {
@@ -1670,19 +1861,62 @@ public final class Image {
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	private static BufferedImage doGetCompatibleBufferedImage(final BufferedImage bufferedImage) {
+		final int compatibleType = BufferedImage.TYPE_INT_ARGB;
+		
+		if(bufferedImage.getType() == compatibleType) {
+			return bufferedImage;
+		}
+		
+		final BufferedImage compatibleBufferedImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), compatibleType);
+		
+		final
+		Graphics2D graphics2D = compatibleBufferedImage.createGraphics();
+		graphics2D.drawImage(bufferedImage, 0, 0, null);
+		
+		return compatibleBufferedImage;
+	}
+	
 	private static BufferedImage doLoadBufferedImage(final File file) {
 		try {
-			final BufferedImage bufferedImage0 = ImageIO.read(Objects.requireNonNull(file, "file == null"));
-			final BufferedImage bufferedImage1 = new BufferedImage(bufferedImage0.getWidth(), bufferedImage0.getHeight(), BufferedImage.TYPE_INT_ARGB);
-			
-			final
-			Graphics2D graphics2D = bufferedImage1.createGraphics();
-			graphics2D.drawImage(bufferedImage0, 0, 0, null);
-			
-			return bufferedImage1;
+			return doGetCompatibleBufferedImage(ImageIO.read(Objects.requireNonNull(file, "file == null")));
 		} catch(final IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+	
+	private static Color[] doConvertByteArrayToColorArray(final byte[] byteArray, final ArrayComponentOrder arrayComponentOrder) {
+		final Color[] colorArray = new Color[byteArray.length / arrayComponentOrder.getComponentCount()];
+		
+		for(int i = 0; i < colorArray.length; i++) {
+			final int r = arrayComponentOrder.readR(byteArray, i * arrayComponentOrder.getComponentCount());
+			final int g = arrayComponentOrder.readG(byteArray, i * arrayComponentOrder.getComponentCount());
+			final int b = arrayComponentOrder.readB(byteArray, i * arrayComponentOrder.getComponentCount());
+			final int a = arrayComponentOrder.readA(byteArray, i * arrayComponentOrder.getComponentCount());
+			
+			colorArray[i] = new Color(r, g, b, a);
+		}
+		
+		return colorArray;
+	}
+	
+	private static Color[] doConvertIntArrayToColorArray(final int[] intArray) {
+		return doConvertIntArrayToColorArray(intArray, PackedIntComponentOrder.ARGB);
+	}
+	
+	private static Color[] doConvertIntArrayToColorArray(final int[] intArray, final ArrayComponentOrder arrayComponentOrder) {
+		final Color[] colorArray = new Color[intArray.length / arrayComponentOrder.getComponentCount()];
+		
+		for(int i = 0; i < colorArray.length; i++) {
+			final int r = arrayComponentOrder.readR(intArray, i * arrayComponentOrder.getComponentCount());
+			final int g = arrayComponentOrder.readG(intArray, i * arrayComponentOrder.getComponentCount());
+			final int b = arrayComponentOrder.readB(intArray, i * arrayComponentOrder.getComponentCount());
+			final int a = arrayComponentOrder.readA(intArray, i * arrayComponentOrder.getComponentCount());
+			
+			colorArray[i] = new Color(r, g, b, a);
+		}
+		
+		return colorArray;
 	}
 	
 	private static Color[] doConvertIntArrayToColorArray(final int[] intArray, final PackedIntComponentOrder packedIntComponentOrder) {

@@ -46,4 +46,20 @@ final class Arrays2 {
 		
 		return array;
 	}
+	
+	public static byte[] requireExactLength(final byte[] array, final int length, final String variableName) {
+		if(array.length != length) {
+			throw new IllegalArgumentException(String.format("%s.length != %s", variableName, Integer.toString(length)));
+		}
+		
+		return array;
+	}
+	
+	public static int[] requireExactLength(final int[] array, final int length, final String variableName) {
+		if(array.length != length) {
+			throw new IllegalArgumentException(String.format("%s.length != %s", variableName, Integer.toString(length)));
+		}
+		
+		return array;
+	}
 }

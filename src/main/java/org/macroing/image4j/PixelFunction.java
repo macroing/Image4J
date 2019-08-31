@@ -87,22 +87,11 @@ public interface PixelFunction {
 		Objects.requireNonNull(colorC, "colorC == null");
 		
 		return (x, y, oldColor) -> {
-			final float pX = x;
-			final float pY = y;
+			final float[] barycentricCoordinates = Geometry.barycentricCoordinates(aX, aY, bX, bY, cX, cY, x, y);
 			
-			final float edgeABX = bX - aX;
-			final float edgeABY = bY - aY;
-			final float edgeACX = cX - aX;
-			final float edgeACY = cY - aY;
-			final float edgeAPX = pX - aX;
-			final float edgeAPY = pY - aY;
-			
-			final float denominator = edgeABX * edgeACY - edgeACX * edgeABY;
-			final float denominatorReciprocal = 1.0F / denominator;
-			
-			final float v = (edgeAPX * edgeACY - edgeACX * edgeAPY) * denominatorReciprocal;
-			final float w = (edgeABX * edgeAPY - edgeAPX * edgeABY) * denominatorReciprocal;
-			final float u = 1.0F - v - w;
+			final float u = barycentricCoordinates[0];
+			final float v = barycentricCoordinates[1];
+			final float w = barycentricCoordinates[2];
 			
 			return colorA.multiply(u).add(colorB.multiply(v)).add(colorC.multiply(w)).minTo0().maxTo1();
 		};
