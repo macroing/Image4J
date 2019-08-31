@@ -18,10 +18,8 @@
  */
 package org.macroing.image4j;
 
-import static org.macroing.image4j.Floats.abs;
 import static org.macroing.image4j.Floats.max;
 import static org.macroing.image4j.Floats.min;
-import static org.macroing.image4j.Integers.abs;
 import static org.macroing.image4j.Integers.max;
 import static org.macroing.image4j.Integers.min;
 
@@ -502,6 +500,13 @@ public final class Image {
 	 * Only the parts of the circle that are inside the boundaries of this {@code Image} instance will be drawn.
 	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.drawCircle(x, y, radius, PixelFunction.constant(color));
+	 * }
+	 * </pre>
 	 * 
 	 * @param x the X-coordinate of the center point of the circle
 	 * @param y the Y-coordinate of the center point of the circle
@@ -510,12 +515,32 @@ public final class Image {
 	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
 	 */
 	public void drawCircle(final int x, final int y, final int radius, final Color color) {
-		Objects.requireNonNull(color, "color == null");
+		drawCircle(x, y, radius, PixelFunction.constant(color));
+	}
+	
+	/**
+	 * Draws a circle with a center point of {@code x} and {@code y} and a radius of {@code radius}, with {@link Color}s computed by {@code pixelFunction}.
+	 * <p>
+	 * Only the parts of the circle that are inside the boundaries of this {@code Image} instance will be drawn.
+	 * <p>
+	 * If either {@code pixelFunction} is {@code null} or {@code pixelFunction.apply(x, y, oldColor)} returns {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param x the X-coordinate of the center point of the circle
+	 * @param y the Y-coordinate of the center point of the circle
+	 * @param radius the radius of the circle
+	 * @param pixelFunction a {@link PixelFunction} that returns a {@code Color} for a given pixel
+	 * @throws NullPointerException thrown if, and only if, either {@code pixelFunction} is {@code null} or {@code pixelFunction.apply(x, y, oldColor)} returns {@code null}
+	 */
+	public void drawCircle(final int x, final int y, final int radius, final PixelFunction pixelFunction) {
+		Objects.requireNonNull(pixelFunction, "pixelFunction == null");
 		
 		for(int i = -radius; i <= radius; i++) {
 			for(int j = -radius; j <= radius; j++) {
 				if(j * j + i * i <= radius * radius && j * j + i * i > (radius - 1) * (radius - 1)) {
-					doSetColor(x + j, y + i, color);
+					final Color oldColor = getColor(x + j, y + i);
+					final Color newColor = Objects.requireNonNull(pixelFunction.apply(x + j, y + i, oldColor));
+					
+					setColor(x + j, y + i, newColor);
 				}
 			}
 		}
@@ -648,6 +673,13 @@ public final class Image {
 	 * Only the parts of the line that are inside the boundaries of this {@code Image} instance will be drawn.
 	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.drawLine(startX, startY, endX, endY, PixelFunction.constant(color));
+	 * }
+	 * </pre>
 	 * 
 	 * @param startX the X-coordinate to start the line at
 	 * @param startY the Y-coordinate to start the line at
@@ -657,41 +689,36 @@ public final class Image {
 	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
 	 */
 	public void drawLine(final int startX, final int startY, final int endX, final int endY, final Color color) {
-		Objects.requireNonNull(color, "color == null");
+		drawLine(startX, startY, endX, endY, PixelFunction.constant(color));
+	}
+	
+	/**
+	 * Draws a line from {@code startX} and {@code startY} to {@code endX} and {@code endY}, with {@link Color}s computed by {@code pixelFunction}.
+	 * <p>
+	 * Only the parts of the line that are inside the boundaries of this {@code Image} instance will be drawn.
+	 * <p>
+	 * If either {@code pixelFunction} is {@code null} or {@code pixelFunction.apply(x, y, oldColor)} returns {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param startX the X-coordinate to start the line at
+	 * @param startY the Y-coordinate to start the line at
+	 * @param endX the X-coordinate to end the line at
+	 * @param endY the Y-coordinate to end the line at
+	 * @param pixelFunction a {@link PixelFunction} that returns a {@code Color} for a given pixel
+	 * @throws NullPointerException thrown if, and only if, either {@code pixelFunction} is {@code null} or {@code pixelFunction.apply(x, y, oldColor)} returns {@code null}
+	 */
+	public void drawLine(final int startX, final int startY, final int endX, final int endY, final PixelFunction pixelFunction) {
+		Objects.requireNonNull(pixelFunction, "pixelFunction == null");
 		
-		final int w = endX - startX;
-		final int h = endY - startY;
+		final int[][] line = Rasterizer.rasterizeLine(startX, startY, endX, endY);
 		
-		final int wAbs = abs(w);
-		final int hAbs = abs(h);
-		
-		final int dAX = w < 0 ? -1 : w > 0 ? 1 : 0;
-		final int dAY = h < 0 ? -1 : h > 0 ? 1 : 0;
-		final int dBX = wAbs > hAbs ? dAX : 0;
-		final int dBY = wAbs > hAbs ? 0 : dAY;
-		
-		final int l = wAbs > hAbs ? wAbs : hAbs;
-		final int s = wAbs > hAbs ? hAbs : wAbs;
-		
-		int n = l >> 1;
-		
-		int x = startX;
-		int y = startY;
-		
-		for(int i = 0; i <= l; i++) {
-			doSetColor(x, y, color);
+		for(int[] pixel : line) {
+			final int x = pixel[0];
+			final int y = pixel[1];
 			
-			n += s;
+			final Color oldColor = getColor(x, y);
+			final Color newColor = Objects.requireNonNull(pixelFunction.apply(x, y, oldColor));
 			
-			if(n >= l) {
-				n -= l;
-				
-				x += dAX;
-				y += dAY;
-			} else {
-				x += dBX;
-				y += dBY;
-			}
+			setColor(x, y, newColor);
 		}
 	}
 	
@@ -722,6 +749,13 @@ public final class Image {
 	 * Only the parts of the rectangle that are inside the boundaries of this {@code Image} instance will be drawn.
 	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.drawRectangle(x, y, w, h, PixelFunction.constant(color));
+	 * }
+	 * </pre>
 	 * 
 	 * @param x the X-coordinate to start the rectangle at
 	 * @param y the Y-coordinate to start the rectangle at
@@ -731,12 +765,33 @@ public final class Image {
 	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
 	 */
 	public void drawRectangle(final int x, final int y, final int w, final int h, final Color color) {
-		Objects.requireNonNull(color, "color == null");
+		drawRectangle(x, y, w, h, PixelFunction.constant(color));
+	}
+	
+	/**
+	 * Draws a rectangle from {@code x} and {@code y} to {@code x + w - 1} and {@code y + h - 1}, with {@link Color}s computed by {@code pixelFunction}.
+	 * <p>
+	 * Only the parts of the rectangle that are inside the boundaries of this {@code Image} instance will be drawn.
+	 * <p>
+	 * If either {@code pixelFunction} is {@code null} or {@code pixelFunction.apply(x, y, oldColor)} returns {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param x the X-coordinate to start the rectangle at
+	 * @param y the Y-coordinate to start the rectangle at
+	 * @param w the width of the rectangle
+	 * @param h the height of the rectangle
+	 * @param pixelFunction a {@link PixelFunction} that returns a {@code Color} for a given pixel
+	 * @throws NullPointerException thrown if, and only if, either {@code pixelFunction} is {@code null} or {@code pixelFunction.apply(x, y, oldColor)} returns {@code null}
+	 */
+	public void drawRectangle(final int x, final int y, final int w, final int h, final PixelFunction pixelFunction) {
+		Objects.requireNonNull(pixelFunction, "pixelFunction == null");
 		
 		for(int i = y; i < y + h; i++) {
 			for(int j = x; j < x + w; j++) {
 				if(i == y || i + 1 == y + h || j == x || j + 1 == x + w) {
-					doSetColor(j, i, color);
+					final Color oldColor = getColor(j, i);
+					final Color newColor = Objects.requireNonNull(pixelFunction.apply(j, i, oldColor));
+					
+					setColor(j, i, newColor);
 				}
 			}
 		}
@@ -771,6 +826,13 @@ public final class Image {
 	 * Only the parts of the triangle that are inside the boundaries of this {@code Image} instance will be drawn.
 	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.drawTriangle(aX, aY, bX, bY, cX, cY, PixelFunction.constant(color));
+	 * }
+	 * </pre>
 	 * 
 	 * @param aX the X-coordinate of the point {@code A}
 	 * @param aY the Y-coordinate of the point {@code A}
@@ -782,11 +844,55 @@ public final class Image {
 	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
 	 */
 	public void drawTriangle(final int aX, final int aY, final int bX, final int bY, final int cX, final int cY, final Color color) {
-		Objects.requireNonNull(color, "color == null");
+		drawTriangle(aX, aY, bX, bY, cX, cY, PixelFunction.constant(color));
+	}
+	
+	/**
+	 * Draws a triangle from three points, denoted {@code A}, {@code B} and {@code C}, with the {@link Color}s {@code colorA}, {@code colorB} and {@code colorC}.
+	 * <p>
+	 * Only the parts of the triangle that are inside the boundaries of this {@code Image} instance will be drawn.
+	 * <p>
+	 * If either {@code colorA}, {@code colorB} or {@code colorC} are {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param aX the X-coordinate of the point {@code A}
+	 * @param aY the Y-coordinate of the point {@code A}
+	 * @param bX the X-coordinate of the point {@code B}
+	 * @param bY the Y-coordinate of the point {@code B}
+	 * @param cX the X-coordinate of the point {@code C}
+	 * @param cY the Y-coordinate of the point {@code C}
+	 * @param colorA the {@code Color} to draw line {@code A} with
+	 * @param colorB the {@code Color} to draw line {@code B} with
+	 * @param colorC the {@code Color} to draw line {@code C} with
+	 * @throws NullPointerException thrown if, and only if, either {@code colorA}, {@code colorB} or {@code colorC} are {@code null}
+	 */
+	public void drawTriangle(final int aX, final int aY, final int bX, final int bY, final int cX, final int cY, final Color colorA, final Color colorB, final Color colorC) {
+		drawLine(aX, aY, bX, bY, Objects.requireNonNull(colorA, "colorA == null"));
+		drawLine(bX, bY, cX, cY, Objects.requireNonNull(colorB, "colorB == null"));
+		drawLine(cX, cY, aX, aY, Objects.requireNonNull(colorC, "colorC == null"));
+	}
+	
+	/**
+	 * Draws a triangle from three points, denoted {@code A}, {@code B} and {@code C}, with {@link Color}s computed by {@code pixelFunction}.
+	 * <p>
+	 * Only the parts of the triangle that are inside the boundaries of this {@code Image} instance will be drawn.
+	 * <p>
+	 * If either {@code pixelFunction} is {@code null} or {@code pixelFunction.apply(x, y, oldColor)} returns {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param aX the X-coordinate of the point {@code A}
+	 * @param aY the Y-coordinate of the point {@code A}
+	 * @param bX the X-coordinate of the point {@code B}
+	 * @param bY the Y-coordinate of the point {@code B}
+	 * @param cX the X-coordinate of the point {@code C}
+	 * @param cY the Y-coordinate of the point {@code C}
+	 * @param pixelFunction a {@link PixelFunction} that returns a {@code Color} for a given pixel
+	 * @throws NullPointerException thrown if, and only if, either {@code pixelFunction} is {@code null} or {@code pixelFunction.apply(x, y, oldColor)} returns {@code null}
+	 */
+	public void drawTriangle(final int aX, final int aY, final int bX, final int bY, final int cX, final int cY, final PixelFunction pixelFunction) {
+		Objects.requireNonNull(pixelFunction, "pixelFunction == null");
 		
-		drawLine(aX, aY, bX, bY, color);
-		drawLine(bX, bY, cX, cY, color);
-		drawLine(cX, cY, aX, aY, color);
+		drawLine(aX, aY, bX, bY, pixelFunction);
+		drawLine(bX, bY, cX, cY, pixelFunction);
+		drawLine(cX, cY, aX, aY, pixelFunction);
 	}
 	
 	/**
@@ -815,6 +921,13 @@ public final class Image {
 	 * Only the parts of the circle that are inside the boundaries of this {@code Image} instance will be filled.
 	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.fillCircle(x, y, radius, PixelFunction.constant(color));
+	 * }
+	 * </pre>
 	 * 
 	 * @param x the X-coordinate of the center point of the circle
 	 * @param y the Y-coordinate of the center point of the circle
@@ -823,12 +936,32 @@ public final class Image {
 	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
 	 */
 	public void fillCircle(final int x, final int y, final int radius, final Color color) {
-		Objects.requireNonNull(color, "color == null");
+		fillCircle(x, y, radius, PixelFunction.constant(color));
+	}
+	
+	/**
+	 * Fills a circle with a center point of {@code x} and {@code y} and a radius of {@code radius}, with {@link Color}s computed by {@code pixelFunction}.
+	 * <p>
+	 * Only the parts of the circle that are inside the boundaries of this {@code Image} instance will be filled.
+	 * <p>
+	 * If either {@code pixelFunction} is {@code null} or {@code pixelFunction.apply(x, y, oldColor)} returns {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param x the X-coordinate of the center point of the circle
+	 * @param y the Y-coordinate of the center point of the circle
+	 * @param radius the radius of the circle
+	 * @param pixelFunction a {@link PixelFunction} that returns a {@code Color} for a given pixel
+	 * @throws NullPointerException thrown if, and only if, either {@code pixelFunction} is {@code null} or {@code pixelFunction.apply(x, y, oldColor)} returns {@code null}
+	 */
+	public void fillCircle(final int x, final int y, final int radius, final PixelFunction pixelFunction) {
+		Objects.requireNonNull(pixelFunction, "pixelFunction == null");
 		
 		for(int i = -radius; i <= radius; i++) {
 			for(int j = -radius; j <= radius; j++) {
 				if(j * j + i * i <= radius * radius) {
-					doSetColor(x + j, y + i, color);
+					final Color oldColor = getColor(x + j, y + i);
+					final Color newColor = Objects.requireNonNull(pixelFunction.apply(x + j, y + i, oldColor));
+					
+					setColor(x + j, y + i, newColor);
 				}
 			}
 		}
@@ -861,6 +994,13 @@ public final class Image {
 	 * Only the parts of the rectangle that are inside the boundaries of this {@code Image} instance will be filled.
 	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.fillRectangle(x, y, w, h, PixelFunction.constant(color));
+	 * }
+	 * </pre>
 	 * 
 	 * @param x the X-coordinate to start the rectangle at
 	 * @param y the Y-coordinate to start the rectangle at
@@ -870,11 +1010,32 @@ public final class Image {
 	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
 	 */
 	public void fillRectangle(final int x, final int y, final int w, final int h, final Color color) {
-		Objects.requireNonNull(color, "color == null");
+		fillRectangle(x, y, w, h, PixelFunction.constant(color));
+	}
+	
+	/**
+	 * Fills a rectangle from {@code x} and {@code y} to {@code x + w - 1} and {@code y + h - 1}, with {@link Color}s computed by {@code pixelFunction}.
+	 * <p>
+	 * Only the parts of the rectangle that are inside the boundaries of this {@code Image} instance will be filled.
+	 * <p>
+	 * If either {@code pixelFunction} is {@code null} or {@code pixelFunction.apply(x, y, oldColor)} returns {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param x the X-coordinate to start the rectangle at
+	 * @param y the Y-coordinate to start the rectangle at
+	 * @param w the width of the rectangle
+	 * @param h the height of the rectangle
+	 * @param pixelFunction a {@link PixelFunction} that returns a {@code Color} for a given pixel
+	 * @throws NullPointerException thrown if, and only if, either {@code pixelFunction} is {@code null} or {@code pixelFunction.apply(x, y, oldColor)} returns {@code null}
+	 */
+	public void fillRectangle(final int x, final int y, final int w, final int h, final PixelFunction pixelFunction) {
+		Objects.requireNonNull(pixelFunction, "pixelFunction == null");
 		
 		for(int i = y; i < y + h; i++) {
 			for(int j = x; j < x + w; j++) {
-				doSetColor(j, i, color);
+				final Color oldColor = getColor(x, y);
+				final Color newColor = Objects.requireNonNull(pixelFunction.apply(x, y, oldColor));
+				
+				setColor(x, y, newColor);
 			}
 		}
 	}
@@ -912,7 +1073,7 @@ public final class Image {
 	 * Calling this method is equivalent to the following:
 	 * <pre>
 	 * {@code
-	 * image.fillTriangle(aX, aY, bX, bY, cX, cY, (x, y, oldColor) -> color);
+	 * image.fillTriangle(aX, aY, bX, bY, cX, cY, PixelFunction.constant(color));
 	 * }
 	 * </pre>
 	 * 
@@ -926,9 +1087,7 @@ public final class Image {
 	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
 	 */
 	public void fillTriangle(final int aX, final int aY, final int bX, final int bY, final int cX, final int cY, Color color) {
-		Objects.requireNonNull(color, "color == null");
-		
-		fillTriangle(aX, aY, bX, bY, cX, cY, (x, y, oldColor) -> color);
+		fillTriangle(aX, aY, bX, bY, cX, cY, PixelFunction.constant(color));
 	}
 	
 	/**
@@ -936,7 +1095,7 @@ public final class Image {
 	 * <p>
 	 * Only the parts of the triangle that are inside the boundaries of this {@code Image} instance will be filled.
 	 * <p>
-	 * If {@code pixelFunction} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * If either {@code pixelFunction} is {@code null} or {@code pixelFunction.apply(x, y, oldColor)} returns {@code null}, a {@code NullPointerException} will be thrown.
 	 * 
 	 * @param aX the X-coordinate of the point {@code A}
 	 * @param aY the Y-coordinate of the point {@code A}
@@ -945,28 +1104,23 @@ public final class Image {
 	 * @param cX the X-coordinate of the point {@code C}
 	 * @param cY the Y-coordinate of the point {@code C}
 	 * @param pixelFunction a {@link PixelFunction} that returns a {@code Color} for a given pixel
-	 * @throws NullPointerException thrown if, and only if, {@code pixelFunction} is {@code null}
+	 * @throws NullPointerException thrown if, and only if, either {@code pixelFunction} is {@code null} or {@code pixelFunction.apply(x, y, oldColor)} returns {@code null}
 	 */
 	public void fillTriangle(final int aX, final int aY, final int bX, final int bY, final int cX, final int cY, final PixelFunction pixelFunction) {
 		Objects.requireNonNull(pixelFunction, "pixelFunction == null");
 		
-		final int[][] vertices = new int[][] {{aX, aY}, {bX, bY}, {cX, cY}};
+		final int[][][] lines = Rasterizer.rasterizeTriangle(aX, aY, bX, bY, cX, cY);
 		
-		doSortVerticesAscendingByY(vertices);
-		
-		final int[] vertexA = vertices[0];
-		final int[] vertexB = vertices[1];
-		final int[] vertexC = vertices[2];
-		
-		if(vertexB[1] == vertexC[1]) {
-			doFillTriangleTopDown(vertexA, vertexB, vertexC, pixelFunction);
-		} else if(vertexA[1] == vertexB[1]) {
-			doFillTriangleBottomUp(vertexA, vertexB, vertexC, pixelFunction);
-		} else {
-			final int[] vertexD = {(int)(vertexA[0] + ((float)(vertexB[1] - vertexA[1]) / (float)(vertexC[1] - vertexA[1])) * (vertexC[0] - vertexA[0])), vertexB[1]};
-			
-			doFillTriangleTopDown(vertexA, vertexB, vertexD, pixelFunction);
-			doFillTriangleBottomUp(vertexB, vertexD, vertexC, pixelFunction);
+		for(final int[][] line : lines) {
+			for(final int[] pixel : line) {
+				final int x = pixel[0];
+				final int y = pixel[1];
+				
+				final Color oldColor = getColor(x, y);
+				final Color newColor = Objects.requireNonNull(pixelFunction.apply(x, y, oldColor));
+				
+				setColor(x, y, newColor);
+			}
 		}
 	}
 	
@@ -1491,56 +1645,6 @@ public final class Image {
 		this.sampleCounts[indexWrappedAround] = newSampleCount;
 	}
 	
-	private void doFillTriangleBottomUp(final int[] vertexA, final int[] vertexB, final int[] vertexC, final PixelFunction pixelFunction) {
-		final float slope0 = (float)(vertexC[0] - vertexA[0]) / (float)(vertexC[1] - vertexA[1]);
-		final float slope1 = (float)(vertexC[0] - vertexB[0]) / (float)(vertexC[1] - vertexB[1]);
-		
-		float x0 = vertexC[0];
-		float x1 = vertexC[0] + 0.5F;
-		
-		for(int y = vertexC[1]; y > vertexA[1]; y--) {
-			final int[][] line = doGetLine((int)(x0), y, (int)(x1), y);
-			
-			for(int i = 0; i < line.length; i++) {
-				final int currentX = line[i][0];
-				final int currentY = line[i][1];
-				
-				final Color oldColor = getColor(currentX, currentY);
-				final Color newColor = Objects.requireNonNull(pixelFunction.apply(currentX, currentY, oldColor));
-				
-				setColor(currentX, currentY, newColor);
-			}
-			
-			x0 -= slope0;
-			x1 -= slope1;
-		}
-	}
-	
-	private void doFillTriangleTopDown(final int[] vertexA, final int[] vertexB, final int[] vertexC, final PixelFunction pixelFunction) {
-		final float slope0 = (float)(vertexB[0] - vertexA[0]) / (float)(vertexB[1] - vertexA[1]);
-		final float slope1 = (float)(vertexC[0] - vertexA[0]) / (float)(vertexC[1] - vertexA[1]);
-		
-		float x0 = vertexA[0];
-		float x1 = vertexA[0] + 0.5F;
-		
-		for(int y = vertexA[1]; y <= vertexB[1]; y++) {
-			final int[][] line = doGetLine((int)(x0), y, (int)(x1), y);
-			
-			for(int i = 0; i < line.length; i++) {
-				final int currentX = line[i][0];
-				final int currentY = line[i][1];
-				
-				final Color oldColor = getColor(currentX, currentY);
-				final Color newColor = Objects.requireNonNull(pixelFunction.apply(currentX, currentY, oldColor));
-				
-				setColor(currentX, currentY, newColor);
-			}
-			
-			x0 += slope0;
-			x1 += slope1;
-		}
-	}
-	
 	private void doSetColor(final int x, final int y, final Color color) {
 		if(x >= 0 && x < this.resolutionX && y >= 0 && y < this.resolutionY) {
 			final int index = y * this.resolutionX + x;
@@ -1589,72 +1693,5 @@ public final class Image {
 		}
 		
 		return colorArray;
-	}
-	
-	private static int[][] doGetLine(final int startX, final int startY, final int endX, final int endY) {
-		final int w = endX - startX;
-		final int h = endY - startY;
-		
-		final int wAbs = abs(w);
-		final int hAbs = abs(h);
-		
-		final int dAX = w < 0 ? -1 : w > 0 ? 1 : 0;
-		final int dAY = h < 0 ? -1 : h > 0 ? 1 : 0;
-		final int dBX = wAbs > hAbs ? dAX : 0;
-		final int dBY = wAbs > hAbs ? 0 : dAY;
-		
-		final int l = wAbs > hAbs ? wAbs : hAbs;
-		final int s = wAbs > hAbs ? hAbs : wAbs;
-		
-		final int[][] line = new int[l + 1][];
-		
-		int n = l >> 1;
-		
-		int x = startX;
-		int y = startY;
-		
-		for(int i = 0; i <= l; i++) {
-			line[i] = new int[] {x, y};
-			
-			n += s;
-			
-			if(n >= l) {
-				n -= l;
-				
-				x += dAX;
-				y += dAY;
-			} else {
-				x += dBX;
-				y += dBY;
-			}
-		}
-		
-		return line;
-	}
-	
-	private static void doSortVerticesAscendingByY(final int[][] vertices) {
-		if(vertices[0][1] > vertices[1][1]) {
-			final int[] a = vertices[0];
-			final int[] b = vertices[1];
-			
-			vertices[0] = b;
-			vertices[1] = a;
-		}
-		
-		if(vertices[0][1] > vertices[2][1]) {
-			final int[] a = vertices[0];
-			final int[] c = vertices[2];
-			
-			vertices[0] = c;
-			vertices[2] = a;
-		}
-		
-		if(vertices[1][1] > vertices[2][1]) {
-			final int[] b = vertices[1];
-			final int[] c = vertices[2];
-			
-			vertices[1] = c;
-			vertices[2] = b;
-		}
 	}
 }
