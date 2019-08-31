@@ -18,9 +18,12 @@
  */
 package org.macroing.image4j;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
+import static org.macroing.image4j.Floats.abs;
+import static org.macroing.image4j.Floats.max;
+import static org.macroing.image4j.Floats.min;
+import static org.macroing.image4j.Integers.abs;
+import static org.macroing.image4j.Integers.max;
+import static org.macroing.image4j.Integers.min;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -906,7 +909,12 @@ public final class Image {
 	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
 	 * <p>
-	 * Note: This method has not been implemented yet!
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.fillTriangle(aX, aY, bX, bY, cX, cY, (x, y, oldColor) -> color);
+	 * }
+	 * </pre>
 	 * 
 	 * @param aX the X-coordinate of the point {@code A}
 	 * @param aY the Y-coordinate of the point {@code A}
@@ -917,8 +925,49 @@ public final class Image {
 	 * @param color the {@code Color} to fill with
 	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
 	 */
-	public void fillTriangle(final int aX, final int aY, final int bX, final int bY, final int cX, final int cY, final Color color) {
-//		TODO: Implement!
+	public void fillTriangle(final int aX, final int aY, final int bX, final int bY, final int cX, final int cY, Color color) {
+		Objects.requireNonNull(color, "color == null");
+		
+		fillTriangle(aX, aY, bX, bY, cX, cY, (x, y, oldColor) -> color);
+	}
+	
+	/**
+	 * Fills a triangle from three points, denoted {@code A}, {@code B} and {@code C}, with {@link Color}s computed by {@code pixelFunction}.
+	 * <p>
+	 * Only the parts of the triangle that are inside the boundaries of this {@code Image} instance will be filled.
+	 * <p>
+	 * If {@code pixelFunction} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param aX the X-coordinate of the point {@code A}
+	 * @param aY the Y-coordinate of the point {@code A}
+	 * @param bX the X-coordinate of the point {@code B}
+	 * @param bY the Y-coordinate of the point {@code B}
+	 * @param cX the X-coordinate of the point {@code C}
+	 * @param cY the Y-coordinate of the point {@code C}
+	 * @param pixelFunction a {@link PixelFunction} that returns a {@code Color} for a given pixel
+	 * @throws NullPointerException thrown if, and only if, {@code pixelFunction} is {@code null}
+	 */
+	public void fillTriangle(final int aX, final int aY, final int bX, final int bY, final int cX, final int cY, final PixelFunction pixelFunction) {
+		Objects.requireNonNull(pixelFunction, "pixelFunction == null");
+		
+		final int[][] vertices = new int[][] {{aX, aY}, {bX, bY}, {cX, cY}};
+		
+		doSortVerticesAscendingByY(vertices);
+		
+		final int[] vertexA = vertices[0];
+		final int[] vertexB = vertices[1];
+		final int[] vertexC = vertices[2];
+		
+		if(vertexB[1] == vertexC[1]) {
+			doFillTriangleTopDown(vertexA, vertexB, vertexC, pixelFunction);
+		} else if(vertexA[1] == vertexB[1]) {
+			doFillTriangleBottomUp(vertexA, vertexB, vertexC, pixelFunction);
+		} else {
+			final int[] vertexD = {(int)(vertexA[0] + ((float)(vertexB[1] - vertexA[1]) / (float)(vertexC[1] - vertexA[1])) * (vertexC[0] - vertexA[0])), vertexB[1]};
+			
+			doFillTriangleTopDown(vertexA, vertexB, vertexD, pixelFunction);
+			doFillTriangleBottomUp(vertexB, vertexD, vertexC, pixelFunction);
+		}
 	}
 	
 	/**
@@ -1442,6 +1491,56 @@ public final class Image {
 		this.sampleCounts[indexWrappedAround] = newSampleCount;
 	}
 	
+	private void doFillTriangleBottomUp(final int[] vertexA, final int[] vertexB, final int[] vertexC, final PixelFunction pixelFunction) {
+		final float slope0 = (float)(vertexC[0] - vertexA[0]) / (float)(vertexC[1] - vertexA[1]);
+		final float slope1 = (float)(vertexC[0] - vertexB[0]) / (float)(vertexC[1] - vertexB[1]);
+		
+		float x0 = vertexC[0];
+		float x1 = vertexC[0] + 0.5F;
+		
+		for(int y = vertexC[1]; y > vertexA[1]; y--) {
+			final int[][] line = doGetLine((int)(x0), y, (int)(x1), y);
+			
+			for(int i = 0; i < line.length; i++) {
+				final int currentX = line[i][0];
+				final int currentY = line[i][1];
+				
+				final Color oldColor = getColor(currentX, currentY);
+				final Color newColor = Objects.requireNonNull(pixelFunction.apply(currentX, currentY, oldColor));
+				
+				setColor(currentX, currentY, newColor);
+			}
+			
+			x0 -= slope0;
+			x1 -= slope1;
+		}
+	}
+	
+	private void doFillTriangleTopDown(final int[] vertexA, final int[] vertexB, final int[] vertexC, final PixelFunction pixelFunction) {
+		final float slope0 = (float)(vertexB[0] - vertexA[0]) / (float)(vertexB[1] - vertexA[1]);
+		final float slope1 = (float)(vertexC[0] - vertexA[0]) / (float)(vertexC[1] - vertexA[1]);
+		
+		float x0 = vertexA[0];
+		float x1 = vertexA[0] + 0.5F;
+		
+		for(int y = vertexA[1]; y <= vertexB[1]; y++) {
+			final int[][] line = doGetLine((int)(x0), y, (int)(x1), y);
+			
+			for(int i = 0; i < line.length; i++) {
+				final int currentX = line[i][0];
+				final int currentY = line[i][1];
+				
+				final Color oldColor = getColor(currentX, currentY);
+				final Color newColor = Objects.requireNonNull(pixelFunction.apply(currentX, currentY, oldColor));
+				
+				setColor(currentX, currentY, newColor);
+			}
+			
+			x0 += slope0;
+			x1 += slope1;
+		}
+	}
+	
 	private void doSetColor(final int x, final int y, final Color color) {
 		if(x >= 0 && x < this.resolutionX && y >= 0 && y < this.resolutionY) {
 			final int index = y * this.resolutionX + x;
@@ -1490,5 +1589,72 @@ public final class Image {
 		}
 		
 		return colorArray;
+	}
+	
+	private static int[][] doGetLine(final int startX, final int startY, final int endX, final int endY) {
+		final int w = endX - startX;
+		final int h = endY - startY;
+		
+		final int wAbs = abs(w);
+		final int hAbs = abs(h);
+		
+		final int dAX = w < 0 ? -1 : w > 0 ? 1 : 0;
+		final int dAY = h < 0 ? -1 : h > 0 ? 1 : 0;
+		final int dBX = wAbs > hAbs ? dAX : 0;
+		final int dBY = wAbs > hAbs ? 0 : dAY;
+		
+		final int l = wAbs > hAbs ? wAbs : hAbs;
+		final int s = wAbs > hAbs ? hAbs : wAbs;
+		
+		final int[][] line = new int[l + 1][];
+		
+		int n = l >> 1;
+		
+		int x = startX;
+		int y = startY;
+		
+		for(int i = 0; i <= l; i++) {
+			line[i] = new int[] {x, y};
+			
+			n += s;
+			
+			if(n >= l) {
+				n -= l;
+				
+				x += dAX;
+				y += dAY;
+			} else {
+				x += dBX;
+				y += dBY;
+			}
+		}
+		
+		return line;
+	}
+	
+	private static void doSortVerticesAscendingByY(final int[][] vertices) {
+		if(vertices[0][1] > vertices[1][1]) {
+			final int[] a = vertices[0];
+			final int[] b = vertices[1];
+			
+			vertices[0] = b;
+			vertices[1] = a;
+		}
+		
+		if(vertices[0][1] > vertices[2][1]) {
+			final int[] a = vertices[0];
+			final int[] c = vertices[2];
+			
+			vertices[0] = c;
+			vertices[2] = a;
+		}
+		
+		if(vertices[1][1] > vertices[2][1]) {
+			final int[] b = vertices[1];
+			final int[] c = vertices[2];
+			
+			vertices[1] = c;
+			vertices[2] = b;
+		}
 	}
 }

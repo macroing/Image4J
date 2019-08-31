@@ -29,6 +29,22 @@ final class Integers {
 		return Math.abs(a);
 	}
 	
+	public static int max(final int a, final int b) {
+		return a >= b ? a : b;
+	}
+	
+	public static int max(final int a, final int b, final int c) {
+		return a >= b && a >= c ? a : b >= c ? b : c;
+	}
+	
+	public static int min(final int a, final int b) {
+		return a <= b ? a : b;
+	}
+	
+	public static int min(final int a, final int b, final int c) {
+		return a <= b && a <= c ? a : b <= c ? b : c;
+	}
+	
 	public static int toInt(final float value) {
 		return (int)(value);
 	}

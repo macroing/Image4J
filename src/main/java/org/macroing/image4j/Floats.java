@@ -36,6 +36,10 @@ final class Floats {
 		return toFloat(Math.abs(a));
 	}
 	
+	public static float blerp(final float value00, final float value01, final float value10, final float value11, final float tX, final float tY) {
+		return lerp(lerp(value00, value01, tX), lerp(value10, value11, tX), tY);
+	}
+	
 	public static float exp(final float a) {
 		return toFloat(Math.exp(a));
 	}
@@ -44,8 +48,8 @@ final class Floats {
 		return toFloat(Math.floor(a));
 	}
 	
-	public static float lerp(final float a, final float b, final float t) {
-		return (1.0F - t) * a + t * b;
+	public static float lerp(final float value0, final float value1, final float t) {
+		return (1.0F - t) * value0 + t * value1;
 	}
 	
 	public static float max(final float a, final float b) {
@@ -91,6 +95,15 @@ final class Floats {
 		final float maximumValue = edgeA > edgeB ? edgeA : edgeB;
 		
 		return value < minimumValue ? minimumValue : value > maximumValue ? maximumValue : value;
+	}
+	
+	public static float smoothstep(final float value, final float a, final float b) {
+		final float minimumValue = min(a, b);
+		final float maximumValue = max(a, b);
+		
+		final float x = saturate((value - minimumValue) / (maximumValue - minimumValue), 0.0F, 1.0F);
+		
+		return x * x * (3.0F - 2.0F * x);
 	}
 	
 	public static float toDegrees(final float angleInRadians) {
