@@ -1,3 +1,12 @@
+2019-08-31  Jörgen Lundgren  <joergen.lundgren@macroing.org>
+
+	* ADD:		A few implementations of PixelFunction have been added. They return a Color by computing Barycentric coordinates and interpolating, returning a constant Color or by computing Simplex-based fractional Brownian motion (fBm) noise.
+	* ADD:		Add new construction methods to the Image class. Some of them are toImage(BufferedImage), toImage(int, int, byte[]) and toImage(int, int, byte[], ArrayComponentOrder).
+	* ADD:		Add new overloaded methods for drawCircle(...), drawLine(...), drawRectangle(...), drawTriangle(...), fillCircle(...) and fillRectangle(...) to the Image class, that takes a PixelFunction as parameter argument.
+	* ADD:		Add a new method fillTriangle(int, int, int, int, int, int, Color, Color, Color) to the Image class.
+	* ADD:		Add a new method fillTriangle(int, int, int, int, int, int, PixelFunction) to the Image class with an actual implementation.
+	* CHANGE:	The methods fillTriangle(int, int, int, int, int, int) and fillTriangle(int, int, int, int, int, int, Color) of the Image class did not have an implementation. They now do.
+
 2019-08-30  Jörgen Lundgren  <joergen.lundgren@macroing.org>
 
 	* ADD:		Add a new NoiseGenerator class that can generate noise based on the Perlin- and Simplex noise algorithms.
