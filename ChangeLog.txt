@@ -1,3 +1,14 @@
+2019-09-01  Jörgen Lundgren  <joergen.lundgren@macroing.org>
+
+	* ADD:		The Image class has two new methods to set a Color given a pixel representation (X- and Y-coordinates or index). These are setColor(int, Color, PixelOperation) and setColor(int, int, Color, PixelOperation).
+	* ADD:		The Image class has two new methods to add a Color sample given a pixel representation (X- and Y-coordinates or index). These are addColorSample(int, Color, PixelOperation) and addColorSample(int, int, Color, PixelOperation).
+	* ADD:		The Image class has two new methods to get a Color given a pixel representation (X- and Y-coordinates or index). These are getColor(int, PixelOperation) and getColor(int, int, PixelOperation).
+	* ADD:		A PixelOperation enum has been added that defines various operations that can be performed on a pixel. The current operations are no-change and wrap-around.
+	* CHANGE:	Optimized the update(Function) and update(Function, int, int, int, int) methods in the Image class. Using String.format(String, Object[]) in a loop is a bad idea.
+	* CHANGE:	The behavior for the methods setColor(int, Color) and setColor(int, int, Color) in the Image class have changed. They no longer wrap around.
+	* CHANGE:	The behavior for the methods addColorSample(int, Color) and addColorSample(int, int, Color) in the Image class have changed. They no longer wrap around.
+	* CHANGE:	The behavior for the methods getColor(int) and getColor(int, int) in the Image class have changed. They no longer wrap around.
+
 2019-08-31  Jörgen Lundgren  <joergen.lundgren@macroing.org>
 
 	* ADD:		A few implementations of PixelFunction have been added. They return a Color by computing Barycentric coordinates and interpolating, returning a constant Color or by computing Simplex-based fractional Brownian motion (fBm) noise.

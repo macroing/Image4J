@@ -1078,6 +1078,58 @@ public final class Color {
 	}
 	
 	/**
+	 * Returns the value of the alpha component (A) as a {@code byte}.
+	 * <p>
+	 * This method assumes the component value to be within the range {@code [0.0, 1.0]}. A component value outside of this range will be clamped.
+	 * <p>
+	 * If the component values are outside the range {@code [0.0, 1.0]}, you may want to call {@link #minTo0()} followed by {@link #maxTo1()}, in order to preserve the ratios between the component values.
+	 * 
+	 * @return the value of the alpha component (A) as a {@code byte}
+	 */
+	public byte getAsByteA() {
+		return (byte)(getAsIntA() & 0xFF);
+	}
+	
+	/**
+	 * Returns the value of the blue component (B) as a {@code byte}.
+	 * <p>
+	 * This method assumes the component value to be within the range {@code [0.0, 1.0]}. A component value outside of this range will be clamped.
+	 * <p>
+	 * If the component values are outside the range {@code [0.0, 1.0]}, you may want to call {@link #minTo0()} followed by {@link #maxTo1()}, in order to preserve the ratios between the component values.
+	 * 
+	 * @return the value of the blue component (B) as a {@code byte}
+	 */
+	public byte getAsByteB() {
+		return (byte)(getAsIntB() & 0xFF);
+	}
+	
+	/**
+	 * Returns the value of the green component (G) as a {@code byte}.
+	 * <p>
+	 * This method assumes the component value to be within the range {@code [0.0, 1.0]}. A component value outside of this range will be clamped.
+	 * <p>
+	 * If the component values are outside the range {@code [0.0, 1.0]}, you may want to call {@link #minTo0()} followed by {@link #maxTo1()}, in order to preserve the ratios between the component values.
+	 * 
+	 * @return the value of the green component (G) as a {@code byte}
+	 */
+	public byte getAsByteG() {
+		return (byte)(getAsIntG() & 0xFF);
+	}
+	
+	/**
+	 * Returns the value of the red component (R) as a {@code byte}.
+	 * <p>
+	 * This method assumes the component value to be within the range {@code [0.0, 1.0]}. A component value outside of this range will be clamped.
+	 * <p>
+	 * If the component values are outside the range {@code [0.0, 1.0]}, you may want to call {@link #minTo0()} followed by {@link #maxTo1()}, in order to preserve the ratios between the component values.
+	 * 
+	 * @return the value of the red component (R) as a {@code byte}
+	 */
+	public byte getAsByteR() {
+		return (byte)(getAsIntR() & 0xFF);
+	}
+	
+	/**
 	 * Returns the average component value of this {@code Color} instance.
 	 * 
 	 * @return the average component value of this {@code Color} instance

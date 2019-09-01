@@ -152,30 +152,71 @@ public final class Image {
 	}
 	
 	/**
-	 * Returns the {@link Color} at {@code index}.
+	 * Returns the {@link Color} of the pixel represented by {@code index}.
 	 * <p>
-	 * If {@code index} is less than {@code 0} or greater than or equal to {@link #getResolution()}, {@code index} will be wrapped around.
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.getColor(index, PixelOperation.NO_CHANGE);
+	 * }
+	 * </pre>
 	 * 
-	 * @param index the index of the {@code Color} to get
-	 * @return the {@code Color} at {@code index}
+	 * @param index the index of the pixel
+	 * @return the {@code Color} of the pixel represented by {@code index}
 	 */
 	public Color getColor(final int index) {
-		return doGetColorWrapAround(index);
+		return getColor(index, PixelOperation.NO_CHANGE);
 	}
 	
 	/**
-	 * Returns the {@link Color} at {@code x} and {@code y}.
+	 * Returns the {@link Color} of the pixel represented by {@code index}.
 	 * <p>
-	 * If {@code x} is less than {@code 0} or greater than or equal to {@link #getResolutionX()}, {@code x} will be wrapped around.
+	 * If {@code pixelOperation} is {@code null}, a {@code NullPointerException} will be thrown.
 	 * <p>
-	 * If {@code y} is less than {@code 0} or greater than or equal to {@link #getResolutionY()}, {@code y} will be wrapped around.
+	 * See the documentation for {@link PixelOperation} to get a more detailed explanation for different pixel operations.
 	 * 
-	 * @param x the X-coordinate of the {@code Color} to get
-	 * @param y the Y-coordinate of the {@code Color} to get
-	 * @return the {@code Color} at {@code x} and {@code y}
+	 * @param index the index of the pixel
+	 * @param pixelOperation the {@code PixelOperation} to use
+	 * @return the {@code Color} of the pixel represented by {@code index}
+	 * @throws NullPointerException thrown if, and only if, {@code pixelOperation} is {@code null}
+	 */
+	public Color getColor(final int index, final PixelOperation pixelOperation) {
+		return doGetColorOrDefault(pixelOperation.getIndex(index, this.resolution), Color.BLACK);
+	}
+	
+	/**
+	 * Returns the {@link Color} of the pixel represented by {@code x} and {@code y}.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.getColor(x, y, PixelOperation.NO_CHANGE);
+	 * }
+	 * </pre>
+	 * 
+	 * @param x the X-coordinate of the pixel
+	 * @param y the Y-coordinate of the pixel
+	 * @return the {@code Color} of the pixel represented by {@code x} and {@code y}
 	 */
 	public Color getColor(final int x, final int y) {
-		return doGetColorWrapAround(x, y);
+		return getColor(x, y, PixelOperation.NO_CHANGE);
+	}
+	
+	/**
+	 * Returns the {@link Color} of the pixel represented by {@code x} and {@code y}.
+	 * <p>
+	 * If {@code pixelOperation} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * See the documentation for {@link PixelOperation} to get a more detailed explanation for different pixel operations.
+	 * 
+	 * @param x the X-coordinate of the pixel
+	 * @param y the Y-coordinate of the pixel
+	 * @param pixelOperation the {@code PixelOperation} to use
+	 * @return the {@code Color} of the pixel represented by {@code x} and {@code y}
+	 * @throws NullPointerException thrown if, and only if, {@code pixelOperation} is {@code null}
+	 */
+	public Color getColor(final int x, final int y, final PixelOperation pixelOperation) {
+		return doGetColorOrDefault(pixelOperation.getX(x, this.resolutionX), pixelOperation.getY(y, this.resolutionY), Color.BLACK);
 	}
 	
 	/**
@@ -436,30 +477,52 @@ public final class Image {
 	/**
 	 * Adds {@code color} as a sample at the pixel represented by {@code index}.
 	 * <p>
-	 * If {@code index} is less than {@code 0} or greater than or equal to {@link #getResolution()}, {@code index} will be wrapped around.
-	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
 	 * <p>
-	 * See the documentation for {@link Color#addSample(Color, int)} to get a more detailed explanation for how this method works.
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.addColorSample(index, color, PixelOperation.NO_CHANGE);
+	 * }
+	 * </pre>
 	 * 
 	 * @param index the index of the pixel where {@code color} should be added as a sample
 	 * @param color the {@link Color} to add as a sample
 	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
 	 */
 	public void addColorSample(final int index, final Color color) {
-		doAddColorSampleWrapAround(index, Objects.requireNonNull(color, "color == null"));
+		addColorSample(index, color, PixelOperation.NO_CHANGE);
+	}
+	
+	/**
+	 * Adds {@code color} as a sample at the pixel represented by {@code index}.
+	 * <p>
+	 * If either {@code color} or {@code pixelOperation} are {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * See the documentation for {@link Color#addSample(Color, int)} to get a more detailed explanation for how this method works.
+	 * <p>
+	 * See the documentation for {@link PixelOperation} to get a more detailed explanation for different pixel operations.
+	 * 
+	 * @param index the index of the pixel where {@code color} should be added as a sample
+	 * @param color the {@link Color} to add as a sample
+	 * @param pixelOperation the {@code PixelOperation} to use
+	 * @throws NullPointerException thrown if, and only if, either {@code color} or {@code pixelOperation} are {@code null}
+	 */
+	public void addColorSample(final int index, final Color color, final PixelOperation pixelOperation) {
+		doAddColorSample(pixelOperation.getIndex(index, this.resolution), Objects.requireNonNull(color, "color == null"));
 	}
 	
 	/**
 	 * Adds {@code color} as a sample at the pixel represented by {@code x} and {@code y}.
 	 * <p>
-	 * If {@code x} is less than {@code 0} or greater than or equal to {@link #getResolutionX()}, {@code x} will be wrapped around.
-	 * <p>
-	 * If {@code y} is less than {@code 0} or greater than or equal to {@link #getResolutionY()}, {@code y} will be wrapped around.
-	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
 	 * <p>
-	 * See the documentation for {@link Color#addSample(Color, int)} to get a more detailed explanation for how this method works.
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.addColorSample(x, y, color, PixelOperation.NO_CHANGE);
+	 * }
+	 * </pre>
 	 * 
 	 * @param x the X-coordinate of the pixel where {@code color} should be added as a sample
 	 * @param y the Y-coordinate of the pixel where {@code color} should be added as a sample
@@ -467,7 +530,26 @@ public final class Image {
 	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
 	 */
 	public void addColorSample(final int x, final int y, final Color color) {
-		doAddColorSampleWrapAround(x, y, Objects.requireNonNull(color, "color == null"));
+		addColorSample(x, y, color, PixelOperation.NO_CHANGE);
+	}
+	
+	/**
+	 * Adds {@code color} as a sample at the pixel represented by {@code x} and {@code y}.
+	 * <p>
+	 * If either {@code color} or {@code pixelOperation} are {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * See the documentation for {@link Color#addSample(Color, int)} to get a more detailed explanation for how this method works.
+	 * <p>
+	 * See the documentation for {@link PixelOperation} to get a more detailed explanation for different pixel operations.
+	 * 
+	 * @param x the X-coordinate of the pixel where {@code color} should be added as a sample
+	 * @param y the Y-coordinate of the pixel where {@code color} should be added as a sample
+	 * @param color the {@link Color} to add as a sample
+	 * @param pixelOperation the {@code PixelOperation} to use
+	 * @throws NullPointerException thrown if, and only if, either {@code color} or {@code pixelOperation} are {@code null}
+	 */
+	public void addColorSample(final int x, final int y, final Color color, final PixelOperation pixelOperation) {
+		doAddColorSample(pixelOperation.getX(x, this.resolutionX), pixelOperation.getY(y, this.resolutionY), Objects.requireNonNull(color, "color == null"));
 	}
 	
 	/**
@@ -498,6 +580,67 @@ public final class Image {
 		for(int i = 0; i < this.colors.length; i++) {
 			this.colors[i] = color;
 			this.sampleCounts[i] = 0;
+		}
+	}
+	
+	/**
+	 * Copies the individual component values of the {@link Color}s in this {@code Image} instance to the {@code byte[]} {@code array}.
+	 * <p>
+	 * If {@code array} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * If {@code array.length != image.getResolution() * arrayComponentOrder.getComponentCount()}, an {@code IllegalArgumentException} will be thrown.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.copyTo(array, ArrayComponentOrder.BGRA);
+	 * }
+	 * </pre>
+	 * 
+	 * @param array the {@code byte[]} to copy the individual component values of the {@code Color}s in this {@code Image} instance to
+	 * @throws IllegalArgumentException thrown if, and only if, {@code array.length != image.getResolution() * arrayComponentOrder.getComponentCount()}
+	 * @throws NullPointerException thrown if, and only if, {@code array} is {@code null}
+	 */
+	public void copyTo(final byte[] array) {
+		copyTo(array, ArrayComponentOrder.BGRA);
+	}
+	
+	/**
+	 * Copies the individual component values of the {@link Color}s in this {@code Image} instance to the {@code byte[]} {@code array}.
+	 * <p>
+	 * If either {@code array} or {@code arrayComponentOrder} are {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * If {@code array.length != image.getResolution() * arrayComponentOrder.getComponentCount()}, an {@code IllegalArgumentException} will be thrown.
+	 * 
+	 * @param array the {@code byte[]} to copy the individual component values of the {@code Color}s in this {@code Image} instance to
+	 * @param arrayComponentOrder an {@link ArrayComponentOrder} to copy the components to {@code array} in the correct order
+	 * @throws IllegalArgumentException thrown if, and only if, {@code array.length != image.getResolution() * arrayComponentOrder.getComponentCount()}
+	 * @throws NullPointerException thrown if, and only if, either {@code array} or {@code arrayComponentOrder} are {@code null}
+	 */
+	public void copyTo(final byte[] array, final ArrayComponentOrder arrayComponentOrder) {
+		Objects.requireNonNull(array, "array == null");
+		Objects.requireNonNull(arrayComponentOrder, "arrayComponentOrder == null");
+		
+		Arrays2.requireExactLength(array, this.colors.length * arrayComponentOrder.getComponentCount(), "array");
+		
+		for(int i = 0, j = 0; i < this.colors.length; i++, j += arrayComponentOrder.getComponentCount()) {
+			final Color color = this.colors[i];
+			
+			if(arrayComponentOrder.hasOffsetR()) {
+				array[j + arrayComponentOrder.getOffsetR()] = color.getAsByteR();
+			}
+			
+			if(arrayComponentOrder.hasOffsetG()) {
+				array[j + arrayComponentOrder.getOffsetG()] = color.getAsByteG();
+			}
+			
+			if(arrayComponentOrder.hasOffsetB()) {
+				array[j + arrayComponentOrder.getOffsetB()] = color.getAsByteB();
+			}
+			
+			if(arrayComponentOrder.hasOffsetA()) {
+				array[j + arrayComponentOrder.getOffsetA()] = color.getAsByteA();
+			}
 		}
 	}
 	
@@ -567,7 +710,7 @@ public final class Image {
 					final Color oldColor = getColor(x + j, y + i);
 					final Color newColor = Objects.requireNonNull(pixelFunction.apply(x + j, y + i, oldColor));
 					
-					setColor(x + j, y + i, newColor);
+					doSetColor(x + j, y + i, newColor);
 				}
 			}
 		}
@@ -745,7 +888,7 @@ public final class Image {
 			final Color oldColor = getColor(x, y);
 			final Color newColor = Objects.requireNonNull(pixelFunction.apply(x, y, oldColor));
 			
-			setColor(x, y, newColor);
+			doSetColor(x, y, newColor);
 		}
 	}
 	
@@ -818,7 +961,7 @@ public final class Image {
 					final Color oldColor = getColor(j, i);
 					final Color newColor = Objects.requireNonNull(pixelFunction.apply(j, i, oldColor));
 					
-					setColor(j, i, newColor);
+					doSetColor(j, i, newColor);
 				}
 			}
 		}
@@ -988,7 +1131,7 @@ public final class Image {
 					final Color oldColor = getColor(x + j, y + i);
 					final Color newColor = Objects.requireNonNull(pixelFunction.apply(x + j, y + i, oldColor));
 					
-					setColor(x + j, y + i, newColor);
+					doSetColor(x + j, y + i, newColor);
 				}
 			}
 		}
@@ -1062,7 +1205,7 @@ public final class Image {
 				final Color oldColor = getColor(x, y);
 				final Color newColor = Objects.requireNonNull(pixelFunction.apply(x, y, oldColor));
 				
-				setColor(x, y, newColor);
+				doSetColor(x, y, newColor);
 			}
 		}
 	}
@@ -1146,7 +1289,7 @@ public final class Image {
 				final Color oldColor = getColor(x, y);
 				final Color newColor = Objects.requireNonNull(pixelFunction.apply(x, y, oldColor));
 				
-				setColor(x, y, newColor);
+				doSetColor(x, y, newColor);
 			}
 		}
 	}
@@ -1311,36 +1454,77 @@ public final class Image {
 	}
 	
 	/**
-	 * Sets {@code color} at {@code index}.
-	 * <p>
-	 * If {@code index} is less than {@code 0} or greater than or equal to {@link #getResolution()}, {@code index} will be wrapped around.
+	 * Sets the {@link Color} of the pixel represented by {@code index} to {@code color}.
 	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.setColor(index, color, PixelOperation.NO_CHANGE);
+	 * }
+	 * </pre>
 	 * 
-	 * @param index the index of the {@code Color} to set
-	 * @param color the {@link Color} to set
+	 * @param index the index of the pixel
+	 * @param color the {@code Color} to set
 	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
 	 */
 	public void setColor(final int index, final Color color) {
-		doSetColorWrapAround(index, Objects.requireNonNull(color, "color == null"));
+		setColor(index, color, PixelOperation.NO_CHANGE);
 	}
 	
 	/**
-	 * Sets {@code color} at {@code x} and {@code y}.
+	 * Sets the {@link Color} of the pixel represented by {@code index} to {@code color}.
 	 * <p>
-	 * If {@code x} is less than {@code 0} or greater than or equal to {@link #getResolutionX()}, {@code x} will be wrapped around.
+	 * If either {@code color} or {@code pixelOperation} are {@code null}, a {@code NullPointerException} will be thrown.
 	 * <p>
-	 * If {@code y} is less than {@code 0} or greater than or equal to {@link #getResolutionY()}, {@code y} will be wrapped around.
+	 * See the documentation for {@link PixelOperation} to get a more detailed explanation for different pixel operations.
+	 * 
+	 * @param index the index of the pixel
+	 * @param color the {@code Color} to set
+	 * @param pixelOperation the {@code PixelOperation} to use
+	 * @throws NullPointerException thrown if, and only if, either {@code color} or {@code pixelOperation} are {@code null}
+	 */
+	public void setColor(final int index, final Color color, final PixelOperation pixelOperation) {
+		doSetColor(pixelOperation.getIndex(index, this.resolution), Objects.requireNonNull(color, "color == null"));
+	}
+	
+	/**
+	 * Sets the {@link Color} of the pixel represented by {@code x} and {@code y} to {@code color}.
 	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.setColor(x, y, color, PixelOperation.NO_CHANGE);
+	 * }
+	 * </pre>
 	 * 
-	 * @param x the X-coordinate of the {@code Color} to set
-	 * @param y the Y-coordinate of the {@code Color} to set
-	 * @param color the {@link Color} to set
+	 * @param x the X-coordinate of the pixel
+	 * @param y the Y-coordinate of the pixel
+	 * @param color the {@code Color} to set
 	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
 	 */
 	public void setColor(final int x, final int y, final Color color) {
-		doSetColorWrapAround(x, y, Objects.requireNonNull(color, "color == null"));
+		setColor(x, y, color, PixelOperation.NO_CHANGE);
+	}
+	
+	/**
+	 * Sets the {@link Color} of the pixel represented by {@code x} and {@code y} to {@code color}.
+	 * <p>
+	 * If either {@code color} or {@code pixelOperation} are {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * See the documentation for {@link PixelOperation} to get a more detailed explanation for different pixel operations.
+	 * 
+	 * @param x the X-coordinate of the pixel
+	 * @param y the Y-coordinate of the pixel
+	 * @param color the {@code Color} to set
+	 * @param pixelOperation the {@code PixelOperation} to use
+	 * @throws NullPointerException thrown if, and only if, either {@code color} or {@code pixelOperation} are {@code null}
+	 */
+	public void setColor(final int x, final int y, final Color color, final PixelOperation pixelOperation) {
+		doSetColor(pixelOperation.getX(x, this.resolutionX), pixelOperation.getY(y, this.resolutionY), Objects.requireNonNull(color, "color == null"));
 	}
 	
 	/**
@@ -1460,7 +1644,7 @@ public final class Image {
 		for(int y = minimumY; y < maximumY; y++) {
 			for(int x = minimumX; x < maximumX; x++) {
 				final Color oldColor = doGetColorOrDefault(x, y, Color.BLACK);
-				final Color newColor = Objects.requireNonNull(function.apply(oldColor), String.format("function.apply(%s) == null: x=%s, y=%s", oldColor, Integer.toString(x), Integer.toString(y)));
+				final Color newColor = Objects2.requireNonNull(function.apply(oldColor), "function.apply(%s) == null: x=%s, y=%s", oldColor, Integer.valueOf(x), Integer.valueOf(y));
 				
 				doSetColor(x, y, newColor);
 			}
@@ -1779,84 +1963,44 @@ public final class Image {
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	private Color doGetColorOrDefault(final int index, final Color color) {
+		return index >= 0 && index < this.resolution ? this.colors[index] : color;
+	}
+	
 	private Color doGetColorOrDefault(final int x, final int y, final Color color) {
 		return x >= 0 && x < this.resolutionX && y >= 0 && y < this.resolutionY ? this.colors[y * this.resolutionX + x] : color;
 	}
 	
-	private Color doGetColorWrapAround(final int index) {
-		return this.colors[doGetIndexWrapAround(index)];
-	}
-	
-	private Color doGetColorWrapAround(final int x, final int y) {
-		return this.colors[doGetIndexWrapAround(x, y)];
-	}
-	
-	private int doGetIndexWrapAround(final int index) {
-		final int resolution = this.resolution;
-		
-		final int currentIndex = Integers.modulo(index, resolution);
-		
-		return currentIndex;
-	}
-	
-	private int doGetIndexWrapAround(final int x, final int y) {
-		final int resolutionX = this.resolutionX;
-		final int resolutionY = this.resolutionY;
-		
-		final int currentX = Integers.modulo(x, resolutionX);
-		final int currentY = Integers.modulo(y, resolutionY);
-		final int currentIndex = currentY * resolutionX + currentX;
-		
-		return currentIndex;
-	}
-	
-	private void doAddColorSampleWrapAround(final int index, final Color color) {
-		final int indexWrappedAround = doGetIndexWrapAround(index);
-		
-		final int oldSampleCount = this.sampleCounts[indexWrappedAround];
-		final int newSampleCount = oldSampleCount + 1;
-		
-		final Color oldAverageColor = this.colors[indexWrappedAround];
-		final Color newAverageColor = oldAverageColor.addSample(color, newSampleCount);
-		
-		this.colors[indexWrappedAround] = newAverageColor;
-		this.sampleCounts[indexWrappedAround] = newSampleCount;
-	}
-	
-	private void doAddColorSampleWrapAround(final int x, final int y, final Color color) {
-		final int indexWrappedAround = doGetIndexWrapAround(x, y);
-		
-		final int oldSampleCount = this.sampleCounts[indexWrappedAround];
-		final int newSampleCount = oldSampleCount + 1;
-		
-		final Color oldAverageColor = this.colors[indexWrappedAround];
-		final Color newAverageColor = oldAverageColor.addSample(color, newSampleCount);
-		
-		this.colors[indexWrappedAround] = newAverageColor;
-		this.sampleCounts[indexWrappedAround] = newSampleCount;
-	}
-	
-	private void doSetColor(final int x, final int y, final Color color) {
-		if(x >= 0 && x < this.resolutionX && y >= 0 && y < this.resolutionY) {
-			final int index = y * this.resolutionX + x;
+	private void doAddColorSample(final int index, final Color color) {
+		if(index >= 0 && index < this.resolution) {
+			final int oldSampleCount = this.sampleCounts[index];
+			final int newSampleCount = oldSampleCount + 1;
 			
+			final Color oldAverageColor = this.colors[index];
+			final Color newAverageColor = oldAverageColor.addSample(color, newSampleCount);
+			
+			this.colors[index] = newAverageColor;
+			this.sampleCounts[index] = newSampleCount;
+		}
+	}
+	
+	private void doAddColorSample(final int x, final int y, final Color color) {
+		if(x >= 0 && x < this.resolutionX && y >= 0 && y < this.resolutionY) {
+			doAddColorSample(y * this.resolutionX + x, color);
+		}
+	}
+	
+	private void doSetColor(final int index, final Color color) {
+		if(index >= 0 && index < this.resolution) {
 			this.colors[index] = color;
 			this.sampleCounts[index] = 1;
 		}
 	}
 	
-	private void doSetColorWrapAround(final int index, final Color color) {
-		final int indexWrappedAround = doGetIndexWrapAround(index);
-		
-		this.colors[indexWrappedAround] = color;
-		this.sampleCounts[indexWrappedAround] = 1;
-	}
-	
-	private void doSetColorWrapAround(final int x, final int y, final Color color) {
-		final int indexWrappedAround = doGetIndexWrapAround(x, y);
-		
-		this.colors[indexWrappedAround] = color;
-		this.sampleCounts[indexWrappedAround] = 1;
+	private void doSetColor(final int x, final int y, final Color color) {
+		if(x >= 0 && x < this.resolutionX && y >= 0 && y < this.resolutionY) {
+			doSetColor(y * this.resolutionX + x, color);
+		}
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
