@@ -25,7 +25,7 @@ package org.macroing.image4j;
  * <p>
  * The operations that can be performed on a pixel are the no-change operation and the wrap-around operation. More operations may be added in the future.
  * <p>
- * <h5>No-Change Operation</h5>
+ * <strong>No-Change Operation</strong>
  * <p>
  * The no-change operation, {@link PixelOperation#NO_CHANGE}, does not change the pixel if it is outside the boundaries of the {@code Image} instance.
  * <p>
@@ -34,7 +34,7 @@ package org.macroing.image4j;
  * <li>{@code Return} {@code Color}: The method returns {@code Color.BLACK}</li>
  * <li>{@code Update} {@code Color}: The method updates nothing</li>
  * </ul>
- * <h5>Wrap-Around Operation</h5>
+ * <strong>Wrap-Around Operation</strong>
  * <p>
  * The wrap-around operation, {@link PixelOperation#WRAP_AROUND}, will change the pixel if it is outside the boundaries of the {@code Image} instance by wrapping its X- and Y-coordinates or index around.
  * <p>
