@@ -34,6 +34,7 @@ package org.macroing.image4j;
  * <li>{@code Return} {@code Color}: The method returns {@code Color.BLACK}</li>
  * <li>{@code Update} {@code Color}: The method updates nothing</li>
  * </ul>
+ * <p>
  * <strong>Wrap-Around Operation</strong>
  * <p>
  * The wrap-around operation, {@link PixelOperation#WRAP_AROUND}, will change the pixel if it is outside the boundaries of the {@code Image} instance by wrapping its X- and Y-coordinates or index around.
