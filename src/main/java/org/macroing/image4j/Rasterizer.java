@@ -20,6 +20,12 @@ package org.macroing.image4j;
 
 import static org.macroing.image4j.Integers.abs;
 
+/**
+ * A class that performs rasterization on lines and triangles.
+ * 
+ * @since 1.0.0
+ * @author J&#246;rgen Lundgren
+ */
 final class Rasterizer {
 	private Rasterizer() {
 		
@@ -27,6 +33,7 @@ final class Rasterizer {
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+//	TODO: Add Javadocs!
 	public static int[][] rasterizeLine(final int startX, final int startY, final int endX, final int endY) {
 //		Rasterizes a line using Bresenham's line algorithm.
 		
@@ -70,6 +77,7 @@ final class Rasterizer {
 		return line;
 	}
 	
+//	TODO: Add Javadocs!
 	public static int[][][] rasterizeTriangle(final int aX, final int aY, final int bX, final int bY, final int cX, final int cY) {
 		final int[][] vertices = new int[][] {{aX, aY}, {bX, bY}, {cX, cY}};
 		

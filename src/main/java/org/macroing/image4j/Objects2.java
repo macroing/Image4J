@@ -18,6 +18,12 @@
  */
 package org.macroing.image4j;
 
+/**
+ * A class that consists exclusively of static methods that returns or performs various operations on {@code Object}s.
+ * 
+ * @since 1.0.0
+ * @author J&#246;rgen Lundgren
+ */
 final class Objects2 {
 	private Objects2() {
 		
@@ -25,6 +31,7 @@ final class Objects2 {
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+//	TODO: Add Javadocs!
 	public static <T> T requireNonNull(final T object, final String format, final Object... args) {
 		if(object == null) {
 			throw new NullPointerException(String.format(format, args));

@@ -18,6 +18,12 @@
  */
 package org.macroing.image4j;
 
+/**
+ * A class that consists exclusively of static methods that returns or performs various operations on arrays.
+ * 
+ * @since 1.0.0
+ * @author J&#246;rgen Lundgren
+ */
 final class Arrays2 {
 	private Arrays2() {
 		
@@ -25,6 +31,7 @@ final class Arrays2 {
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+//	TODO: Add Javadocs!
 	public static <T> T[] requireDeepNonNull(final T[] array, final String variableName) {
 		if(array == null) {
 			throw new NullPointerException(String.format("%s == null", variableName));
@@ -39,6 +46,7 @@ final class Arrays2 {
 		return array;
 	}
 	
+//	TODO: Add Javadocs!
 	public static <T> T[] requireExactLength(final T[] array, final int length, final String variableName) {
 		if(array.length != length) {
 			throw new IllegalArgumentException(String.format("%s.length != %s", variableName, Integer.toString(length)));
@@ -47,6 +55,7 @@ final class Arrays2 {
 		return array;
 	}
 	
+//	TODO: Add Javadocs!
 	public static byte[] requireExactLength(final byte[] array, final int length, final String variableName) {
 		if(array.length != length) {
 			throw new IllegalArgumentException(String.format("%s.length != %s", variableName, Integer.toString(length)));
@@ -55,6 +64,7 @@ final class Arrays2 {
 		return array;
 	}
 	
+//	TODO: Add Javadocs!
 	public static int[] requireExactLength(final int[] array, final int length, final String variableName) {
 		if(array.length != length) {
 			throw new IllegalArgumentException(String.format("%s.length != %s", variableName, Integer.toString(length)));

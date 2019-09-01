@@ -20,6 +20,12 @@ package org.macroing.image4j;
 
 import java.text.DecimalFormat;
 
+/**
+ * A class that consists exclusively of static methods that returns or performs various operations on {@code String}s.
+ * 
+ * @since 1.0.0
+ * @author J&#246;rgen Lundgren
+ */
 final class Strings {
 	private static final DecimalFormat DECIMAL_FORMAT = doCreateDecimalFormat();
 	
@@ -31,6 +37,12 @@ final class Strings {
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	/**
+	 * Returns a {@code String} representation of {@code value} without scientific notation.
+	 * 
+	 * @param value a {@code float} value
+	 * @return a {@code String} representation of {@code value} without scientific notation
+	 */
 	public static String toNonScientificNotation(final float value) {
 		return DECIMAL_FORMAT.format(value).replace(',', '.');
 	}
