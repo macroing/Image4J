@@ -47,6 +47,13 @@ package org.macroing.image4j;
  * <li>{@code Return} {@code Color}: The method returns the {@code Color} of the changed pixel</li>
  * <li>{@code Update} {@code Color}: The method updates the {@code Color} of the changed pixel</li>
  * </ul>
+ * <p>
+ * The following code snippet shows how the wrap-around operation works, given the two variables {@code value} and {@code maximumValue}:
+ * <pre>
+ * {@code
+ * int changedValue = value < 0 ? (value % maximumValue + maximumValue) % maximumValue : value % maximumValue;
+ * }
+ * </pre>
  * 
  * @since 1.0.0
  * @author J&#246;rgen Lundgren
