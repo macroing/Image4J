@@ -26,7 +26,7 @@ public class BlendExample {
         Image image_1 = Image.load("Image-1.png");
         
         Image image = Image.blend(image_0, image_1, 0.5F);
-        image.save("Image-Result.png");
+        image.save("Blend-Example.png");
     }
 }
 ```
@@ -41,7 +41,7 @@ public class ConvolutionKernelExample {
     public static void main(String[] args) {
         Image image = Image.load("Image.png");
         image.multiply(ConvolutionKernel33.SHARPEN);
-        image.save("Image-Result.png");
+        image.save("Convolution-Kernel-Example.png");
     }
 }
 ```
@@ -56,7 +56,7 @@ public class CropExample {
     public static void main(String[] args) {
         Image image = Image.load("Image.png");
         image = image.crop(50, 50, image.getResolutionX() - 50, image.getResolutionY() - 50, Color.BLACK, false, false);
-        image.save("Image-Result.png");
+        image.save("Crop-Example.png");
     }
 }
 ```
@@ -76,7 +76,7 @@ public class FillAndDrawExample {
 //      The two methods below are equivalent:
         image.drawImage(50, 50, image_0);
 //      image.drawImage(50, 50, image_0, (colorA, colorB) -> Color.blend(colorA, colorB, colorB.a));
-        image.save("Image-Result.png");
+        image.save("Fill-And-Draw-Example.png");
 }
 ```
 
@@ -95,7 +95,7 @@ public class FillExample {
         image.fillCircle(400, 600, 100, PixelFunction.simplexFractionalBrownianMotion(colorCircle, 300.0F, 500.0F, 500.0F, 700.0F));
         image.fillTriangle(300, 100, 500, 400, 500, 150, PixelFunction.simplexFractionalBrownianMotion(colorTriangle, 300.0F, 100.0F, 500.0F, 400.0F));
         image.fillTriangle(120, 60, 45, 200, 400, 400, PixelFunction.barycentricInterpolation(120.0F, 60.0F, 45.0F, 200.0F, 400.0F, 400.0F));
-        image.save("Image-Result.png");
+        image.save("Fill-Example.png");
     }
 }
 ```
@@ -125,7 +125,7 @@ public class NoiseExample {
             image.setColor(index, color);
         }
         
-        image.save("Image-Result.png");
+        image.save("Noise-Example.png");
     }
 }
 ```
@@ -141,7 +141,7 @@ public class UpdateExample {
     public static void main(String[] args) {
         Image image = Image.load("Image.png");
         image.update(color -> Color.blend(color, Color.randomRed(), 0.5F));
-        image.save("Image-Result.png");
+        image.save("Update-Example.png");
     }
 }
 ```
