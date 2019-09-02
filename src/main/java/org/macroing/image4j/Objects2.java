@@ -18,6 +18,8 @@
  */
 package org.macroing.image4j;
 
+import java.util.IllegalFormatException;
+
 /**
  * A class that consists exclusively of static methods that returns or performs various operations on {@code Object}s.
  * 
@@ -31,7 +33,25 @@ final class Objects2 {
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-//	TODO: Add Javadocs!
+	/**
+	 * Checks that {@code object} is not {@code null}.
+	 * <p>
+	 * Returns {@code object}, if it is not {@code null}.
+	 * <p>
+	 * If {@code object} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * The message to the {@code NullPointerException} is created by {@code String.format(format, args)}. This only happens when {@code object} is {@code null}.
+	 * <p>
+	 * If {@code String.format(format, args)} fails, an {@code IllegalFormatException} will be thrown.
+	 * 
+	 * @param <T> the generic type of {@code object}
+	 * @param object the {@code Object} to check
+	 * @param format a format string
+	 * @param args arguments referenced by the format specifiers in the format string
+	 * @return {@code object}, if it is not {@code null}
+	 * @throws IllegalFormatException thrown if, and only if, {@code String.format(format, args)} fails
+	 * @throws NullPointerException thrown if, and only if, {@code object} is {@code null}
+	 */
 	public static <T> T requireNonNull(final T object, final String format, final Object... args) {
 		if(object == null) {
 			throw new NullPointerException(String.format(format, args));

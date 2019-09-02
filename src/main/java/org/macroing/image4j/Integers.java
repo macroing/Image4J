@@ -151,7 +151,7 @@ final class Integers {
 	 * Calling this method is equivalent to the following:
 	 * <pre>
 	 * {@code
-	 * Integers.saturate(value, 0, 255)
+	 * Integers.saturate(value, 0, 255);
 	 * }
 	 * </pre>
 	 * 

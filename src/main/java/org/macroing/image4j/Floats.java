@@ -60,10 +60,10 @@ final class Floats {
 	 * <p>
 	 * Returns the bilinearly interpolated value.
 	 * <p>
-	 * Calling this method is equivalent to the following
+	 * Calling this method is equivalent to the following:
 	 * <pre>
 	 * {@code
-	 * lerp(lerp(value00, value01, tX), lerp(value10, value11, tX), tY)
+	 * Floats.lerp(Floats.lerp(value00, value01, tX), Floats.lerp(value10, value11, tX), tY);
 	 * }
 	 * </pre>
 	 * 
@@ -207,7 +207,7 @@ final class Floats {
 	 * Calling this method is equivalent to the following:
 	 * <pre>
 	 * {@code
-	 * Floats.saturate(value, 0.0F, 1.0F)
+	 * Floats.saturate(value, 0.0F, 1.0F);
 	 * }
 	 * </pre>
 	 * 
@@ -273,6 +273,16 @@ final class Floats {
 	 */
 	public static float toFloat(final double value) {
 		return (float)(value);
+	}
+	
+	/**
+	 * Returns a {@code float} representation of an {@code int} value.
+	 * 
+	 * @param value an {@code int} value
+	 * @return a {@code float} representation of an {@code int} value
+	 */
+	public static float toFloat(final int value) {
+		return value;
 	}
 	
 	/**

@@ -771,47 +771,38 @@ public final class Image {
 		final int imageBResolutionX = imageB.resolutionX;
 		final int imageBResolutionY = imageB.resolutionY;
 		
-//		Initialize the local X- and Y-coordinates for Image A:
-		final int imageAMinimumX = 0;
-		final int imageAMinimumY = 0;
-		final int imageAMaximumX = imageAResolutionX;
-		final int imageAMaximumY = imageAResolutionY;
+//		Calculate the bounding boxes:
+		final int[][] boundingBoxes = Geometry.calculateRectangleBoundingBoxes(0, 0, imageAResolutionX, imageAResolutionY, x, y, imageBResolutionX, imageBResolutionY);
 		
-//		Initialize the local X- and Y-coordinates for Image B:
-		final int imageBMinimumX = 0;
-		final int imageBMinimumY = 0;
-		final int imageBMaximumX = imageBResolutionX;
-		final int imageBMaximumY = imageBResolutionY;
-		
-//		Initialize the transformed X- and Y-coordinates for Image B:
-		final int imageBTransformedMinimumX = imageBMinimumX + x;
-		final int imageBTransformedMinimumY = imageBMinimumY + y;
-		final int imageBTransformedMaximumX = imageBMaximumX + x;
-		final int imageBTransformedMaximumY = imageBMaximumY + y;
-		
-//		Initialize the cropped X- and Y-coordinates for Image A:
-		final int imageACroppedMinimumX = max(imageBTransformedMinimumX, imageAMinimumX);
-		final int imageACroppedMinimumY = max(imageBTransformedMinimumY, imageAMinimumY);
-		final int imageACroppedMaximumX = min(imageBTransformedMaximumX, imageAMaximumX);
-		final int imageACroppedMaximumY = min(imageBTransformedMaximumY, imageAMaximumY);
-		
-		for(int imageAY = imageACroppedMinimumY; imageAY < imageACroppedMaximumY; imageAY++) {
-			for(int imageAX = imageACroppedMinimumX; imageAX < imageACroppedMaximumX; imageAX++) {
-//				Transform back to the local X- and Y-coordinates for Image B:
-				final int imageBX = imageAX - x;
-				final int imageBY = imageAY - y;
-				
-//				Calculate the indices for Image A and Image B:
-				final int imageAIndex = imageAY * imageAResolutionX + imageAX;
-				final int imageBIndex = imageBY * imageBResolutionX + imageBX;
-				
-				final Color colorA = imageA.colors[imageAIndex];
-				final Color colorB = imageB.colors[imageBIndex];
-				final Color colorR = Objects.requireNonNull(biFunction.apply(colorA, colorB));
-				
-//				Retrieve the current Color and sample count from Image B and draw it to Image A:
-				imageA.colors[imageAIndex] = colorR;
-				imageA.sampleCounts[imageAIndex] = imageB.sampleCounts[imageBIndex];
+//		Check that Image A and Image B overlaps:
+		if(boundingBoxes[6].length == 4 && boundingBoxes[7].length == 4) {
+//			Retrieve the minimum and maximum X- and Y-coordinates for Image A:
+			final int imageAMinimumX = boundingBoxes[6][0];
+			final int imageAMinimumY = boundingBoxes[6][1];
+			final int imageAMaximumX = boundingBoxes[6][2];
+			final int imageAMaximumY = boundingBoxes[6][3];
+			
+//			Retrieve the minimum and maximum X- and Y-coordinates for Image B:
+			final int imageBMinimumX = boundingBoxes[7][0];
+			final int imageBMinimumY = boundingBoxes[7][1];
+			final int imageBMaximumX = boundingBoxes[7][2];
+			final int imageBMaximumY = boundingBoxes[7][3];
+			
+			for(int imageAY = imageAMinimumY, imageBY = imageBMinimumY; imageAY < imageAMaximumY && imageBY < imageBMaximumY; imageAY++, imageBY++) {
+				for(int imageAX = imageAMinimumX, imageBX = imageBMinimumX; imageAX < imageAMaximumX && imageBX < imageBMaximumX; imageAX++, imageBX++) {
+//					Calculate the indices for Image A and Image B:
+					final int imageAIndex = imageAY * imageAResolutionX + imageAX;
+					final int imageBIndex = imageBY * imageBResolutionX + imageBX;
+					
+//					Calculate the resulting Color:
+					final Color colorA = imageA.colors[imageAIndex];
+					final Color colorB = imageB.colors[imageBIndex];
+					final Color colorR = Objects.requireNonNull(biFunction.apply(colorA, colorB));
+					
+//					Retrieve the current Color and sample count from Image B and draw it to Image A:
+					imageA.colors[imageAIndex] = colorR;
+					imageA.sampleCounts[imageAIndex] = imageB.sampleCounts[imageBIndex];
+				}
 			}
 		}
 	}
@@ -879,9 +870,12 @@ public final class Image {
 	public void drawLine(final int startX, final int startY, final int endX, final int endY, final PixelFunction pixelFunction) {
 		Objects.requireNonNull(pixelFunction, "pixelFunction == null");
 		
-		final int[][] line = Rasterizer.rasterizeLine(startX, startY, endX, endY);
+		final int resolutionX = this.resolutionX;
+		final int resolutionY = this.resolutionY;
 		
-		for(int[] pixel : line) {
+		final int[][] scanLine = Rasterizer.rasterizeLine(startX, startY, endX, endY, resolutionX, resolutionY);
+		
+		for(int[] pixel : scanLine) {
 			final int x = pixel[0];
 			final int y = pixel[1];
 			
@@ -1279,10 +1273,13 @@ public final class Image {
 	public void fillTriangle(final int aX, final int aY, final int bX, final int bY, final int cX, final int cY, final PixelFunction pixelFunction) {
 		Objects.requireNonNull(pixelFunction, "pixelFunction == null");
 		
-		final int[][][] lines = Rasterizer.rasterizeTriangle(aX, aY, bX, bY, cX, cY);
+		final int resolutionX = this.resolutionX;
+		final int resolutionY = this.resolutionY;
 		
-		for(final int[][] line : lines) {
-			for(final int[] pixel : line) {
+		final int[][][] scanLines = Rasterizer.rasterizeTriangle(aX, aY, bX, bY, cX, cY, resolutionX, resolutionY);
+		
+		for(final int[][] scanLine : scanLines) {
+			for(final int[] pixel : scanLine) {
 				final int x = pixel[0];
 				final int y = pixel[1];
 				

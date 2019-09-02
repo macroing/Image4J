@@ -31,7 +31,18 @@ final class Arrays2 {
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-//	TODO: Add Javadocs!
+	/**
+	 * Checks that {@code array} and all of its elements are not {@code null}.
+	 * <p>
+	 * Returns {@code array}, if it is not {@code null} and it contains no elements that are.
+	 * <p>
+	 * If either {@code array} or any of its elements are {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param array the array to check
+	 * @param variableName the name of the variable to check, which will be part of the message supplied to the {@code IllegalArgumentException}
+	 * @return {@code array}, if it is not {@code null} and it contains no elements that are
+	 * @throws NullPointerException thrown if, and only if, either {@code array} or any of its elements are {@code null}
+	 */
 	public static <T> T[] requireDeepNonNull(final T[] array, final String variableName) {
 		if(array == null) {
 			throw new NullPointerException(String.format("%s == null", variableName));
@@ -46,28 +57,73 @@ final class Arrays2 {
 		return array;
 	}
 	
-//	TODO: Add Javadocs!
-	public static <T> T[] requireExactLength(final T[] array, final int length, final String variableName) {
-		if(array.length != length) {
-			throw new IllegalArgumentException(String.format("%s.length != %s", variableName, Integer.toString(length)));
+	/**
+	 * Checks that {@code array.length == expectedLength}.
+	 * <p>
+	 * Returns {@code array}.
+	 * <p>
+	 * If {@code array} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * If {@code array.length != expectedLength}, an {@code IllegalArgumentException} will be thrown.
+	 * 
+	 * @param array the array to check
+	 * @param expectedLength the expected length of {@code array}
+	 * @param variableName the name of the variable to check, which will be part of the message supplied to the {@code IllegalArgumentException}
+	 * @return {@code array}
+	 * @throws IllegalArgumentException thrown if, and only if, {@code array.length != expectedLength}
+	 * @throws NullPointerException thrown if, and only if, {@code array} is {@code null}
+	 */
+	public static <T> T[] requireExactLength(final T[] array, final int expectedLength, final String variableName) {
+		if(array.length != expectedLength) {
+			throw new IllegalArgumentException(String.format("%s.length != %s", variableName, Integer.toString(expectedLength)));
 		}
 		
 		return array;
 	}
 	
-//	TODO: Add Javadocs!
-	public static byte[] requireExactLength(final byte[] array, final int length, final String variableName) {
-		if(array.length != length) {
-			throw new IllegalArgumentException(String.format("%s.length != %s", variableName, Integer.toString(length)));
+	/**
+	 * Checks that {@code array.length == expectedLength}.
+	 * <p>
+	 * Returns {@code array}.
+	 * <p>
+	 * If {@code array} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * If {@code array.length != expectedLength}, an {@code IllegalArgumentException} will be thrown.
+	 * 
+	 * @param array the array to check
+	 * @param expectedLength the expected length of {@code array}
+	 * @param variableName the name of the variable to check, which will be part of the message supplied to the {@code IllegalArgumentException}
+	 * @return {@code array}
+	 * @throws IllegalArgumentException thrown if, and only if, {@code array.length != expectedLength}
+	 * @throws NullPointerException thrown if, and only if, {@code array} is {@code null}
+	 */
+	public static byte[] requireExactLength(final byte[] array, final int expectedLength, final String variableName) {
+		if(array.length != expectedLength) {
+			throw new IllegalArgumentException(String.format("%s.length != %s", variableName, Integer.toString(expectedLength)));
 		}
 		
 		return array;
 	}
 	
-//	TODO: Add Javadocs!
-	public static int[] requireExactLength(final int[] array, final int length, final String variableName) {
-		if(array.length != length) {
-			throw new IllegalArgumentException(String.format("%s.length != %s", variableName, Integer.toString(length)));
+	/**
+	 * Checks that {@code array.length == expectedLength}.
+	 * <p>
+	 * Returns {@code array}.
+	 * <p>
+	 * If {@code array} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * If {@code array.length != expectedLength}, an {@code IllegalArgumentException} will be thrown.
+	 * 
+	 * @param array the array to check
+	 * @param expectedLength the expected length of {@code array}
+	 * @param variableName the name of the variable to check, which will be part of the message supplied to the {@code IllegalArgumentException}
+	 * @return {@code array}
+	 * @throws IllegalArgumentException thrown if, and only if, {@code array.length != expectedLength}
+	 * @throws NullPointerException thrown if, and only if, {@code array} is {@code null}
+	 */
+	public static int[] requireExactLength(final int[] array, final int expectedLength, final String variableName) {
+		if(array.length != expectedLength) {
+			throw new IllegalArgumentException(String.format("%s.length != %s", variableName, Integer.toString(expectedLength)));
 		}
 		
 		return array;

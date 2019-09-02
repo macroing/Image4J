@@ -18,7 +18,9 @@
  */
 package org.macroing.image4j;
 
+import static org.macroing.image4j.Floats.toFloat;
 import static org.macroing.image4j.Integers.abs;
+import static org.macroing.image4j.Integers.toInt;
 
 /**
  * A class that performs rasterization on lines and triangles.
@@ -33,12 +35,41 @@ final class Rasterizer {
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-//	TODO: Add Javadocs!
-	public static int[][] rasterizeLine(final int startX, final int startY, final int endX, final int endY) {
-//		Rasterizes a line using Bresenham's line algorithm.
+	/**
+	 * Performs rasterization on the line from {@code startX} and {@code startY} to {@code endX} and {@code endY}.
+	 * <p>
+	 * Returns a scan line that contains X- and Y-coordinates for each individual pixel.
+	 * <p>
+	 * This method uses Bresenham's line algorithm, but it also performs clipping to the intervals {@code [0, resolutionX)} and {@code [0, resolutionY)}.
+	 * <p>
+	 * The following example demonstrates how you can use this method:
+	 * <pre>
+	 * <code>
+	 * int[][] scanLine = Rasterizer.rasterizeLine(startX, startY, endX, endY, resolutionX, resolutionY);
+	 * 
+	 * for(int[] pixel : scanLine) {
+	 *     int x = pixel[0];
+	 *     int y = pixel[1];
+	 * }
+	 * </code>
+	 * </pre>
+	 * 
+	 * @param startX the X-coordinate to start from
+	 * @param startY the Y-coordinate to start from
+	 * @param endX the X-coordinate to end at
+	 * @param endY the Y-coordinate to end at
+	 * @param resolutionX the resolution of the X-axis
+	 * @param resolutionY the resolution of the Y-axis
+	 * @return a scan line that contains X- and Y-coordinates for each individual pixel
+	 */
+	public static int[][] rasterizeLine(final int startX, final int startY, final int endX, final int endY, final int resolutionX, final int resolutionY) {
+		final int clippedStartX = startX < 0 ? 0 : startX >= resolutionX ? resolutionX - 1 : startX;
+		final int clippedStartY = startY < 0 ? 0 : startY >= resolutionY ? resolutionY - 1 : startY;
+		final int clippedEndX = endX < 0 ? 0 : endX >= resolutionX ? resolutionX - 1 : endX;
+		final int clippedEndY = endY < 0 ? 0 : endY >= resolutionY ? resolutionY - 1 : endY;
 		
-		final int w = endX - startX;
-		final int h = endY - startY;
+		final int w = clippedEndX - clippedStartX;
+		final int h = clippedEndY - clippedStartY;
 		
 		final int wAbs = abs(w);
 		final int hAbs = abs(h);
@@ -51,15 +82,15 @@ final class Rasterizer {
 		final int l = wAbs > hAbs ? wAbs : hAbs;
 		final int s = wAbs > hAbs ? hAbs : wAbs;
 		
-		final int[][] line = new int[l + 1][];
+		final int[][] scanLine = new int[l + 1][];
 		
 		int n = l >> 1;
 		
-		int x = startX;
-		int y = startY;
+		int x = clippedStartX;
+		int y = clippedStartY;
 		
 		for(int i = 0; i <= l; i++) {
-			line[i] = new int[] {x, y};
+			scanLine[i] = new int[] {x, y};
 			
 			n += s;
 			
@@ -74,11 +105,39 @@ final class Rasterizer {
 			}
 		}
 		
-		return line;
+		return scanLine;
 	}
 	
-//	TODO: Add Javadocs!
-	public static int[][][] rasterizeTriangle(final int aX, final int aY, final int bX, final int bY, final int cX, final int cY) {
+	/**
+	 * Performs rasterization on the triangle defined by {@code aX}, {@code aY}, {@code bX}, {@code bY}, {@code cX} and {@code cY}.
+	 * <p>
+	 * Returns a list of scan lines.
+	 * <p>
+	 * The following example demonstrates how you can use this method:
+	 * <pre>
+	 * <code>
+	 * int[][][] scanLines = Rasterizer.rasterizeTriangle(aX, aY, bX, bY, cX, cY, resolutionX, resolutionY);
+	 * 
+	 * for(int[][] scanLine : scanLines) {
+	 *     for(int[] pixel : scanLine) {
+	 *         int x = pixel[0];
+	 *         int y = pixel[1];
+	 *     }
+	 * }
+	 * </code>
+	 * </pre>
+	 * 
+	 * @param aX the X-coordinate of the point {@code A}
+	 * @param aY the Y-coordinate of the point {@code A}
+	 * @param bX the X-coordinate of the point {@code B}
+	 * @param bY the Y-coordinate of the point {@code B}
+	 * @param cX the X-coordinate of the point {@code C}
+	 * @param cY the Y-coordinate of the point {@code C}
+	 * @param resolutionX the resolution of the X-axis
+	 * @param resolutionY the resolution of the Y-axis
+	 * @return a list of scan lines
+	 */
+	public static int[][][] rasterizeTriangle(final int aX, final int aY, final int bX, final int bY, final int cX, final int cY, final int resolutionX, final int resolutionY) {
 		final int[][] vertices = new int[][] {{aX, aY}, {bX, bY}, {cX, cY}};
 		
 		doSortVerticesAscendingByY(vertices);
@@ -88,33 +147,33 @@ final class Rasterizer {
 		final int[] vertexC = vertices[2];
 		
 		if(vertexB[1] == vertexC[1]) {
-			return doRasterizeTriangleTopDown(vertexA, vertexB, vertexC);
+			return doRasterizeTriangleTopDown(vertexA, vertexB, vertexC, resolutionX, resolutionY);
 		} else if(vertexA[1] == vertexB[1]) {
-			return doRasterizeTriangleBottomUp(vertexA, vertexB, vertexC);
+			return doRasterizeTriangleBottomUp(vertexA, vertexB, vertexC, resolutionX, resolutionY);
 		} else {
-			final int[] vertexD = {(int)(vertexA[0] + ((float)(vertexB[1] - vertexA[1]) / (float)(vertexC[1] - vertexA[1])) * (vertexC[0] - vertexA[0])), vertexB[1]};
+			final int[] vertexD = {toInt(vertexA[0] + (toFloat(vertexB[1] - vertexA[1]) / (vertexC[1] - vertexA[1])) * (vertexC[0] - vertexA[0])), vertexB[1]};
 			
-			final int[][][] linesTopDown = doRasterizeTriangleTopDown(vertexA, vertexB, vertexD);
-			final int[][][] linesBottomUp = doRasterizeTriangleBottomUp(vertexB, vertexD, vertexC);
-			final int[][][] lines = new int[linesTopDown.length + linesBottomUp.length][][];
+			final int[][][] scanLinesTopDown = doRasterizeTriangleTopDown(vertexA, vertexB, vertexD, resolutionX, resolutionY);
+			final int[][][] scanLinesBottomUp = doRasterizeTriangleBottomUp(vertexB, vertexD, vertexC, resolutionX, resolutionY);
+			final int[][][] scanLines = new int[scanLinesTopDown.length + scanLinesBottomUp.length][][];
 			
-			for(int i = 0; i < linesTopDown.length; i++) {
-				lines[i] = linesTopDown[i];
+			for(int i = 0; i < scanLinesTopDown.length; i++) {
+				scanLines[i] = scanLinesTopDown[i];
 			}
 			
-			for(int i = linesTopDown.length, j = 0; i < lines.length && j < linesBottomUp.length; i++, j++) {
-				lines[i] = linesBottomUp[j];
+			for(int i = scanLinesTopDown.length, j = 0; i < scanLines.length && j < scanLinesBottomUp.length; i++, j++) {
+				scanLines[i] = scanLinesBottomUp[j];
 			}
 			
-			return lines;
+			return scanLines;
 		}
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	private static int[][][] doRasterizeTriangleBottomUp(final int[] vertexA, final int[] vertexB, final int[] vertexC) {
-		final float slope0 = (float)(vertexC[0] - vertexA[0]) / (float)(vertexC[1] - vertexA[1]);
-		final float slope1 = (float)(vertexC[0] - vertexB[0]) / (float)(vertexC[1] - vertexB[1]);
+	private static int[][][] doRasterizeTriangleBottomUp(final int[] vertexA, final int[] vertexB, final int[] vertexC, final int resolutionX, final int resolutionY) {
+		final float slope0 = toFloat(vertexC[0] - vertexA[0]) / (vertexC[1] - vertexA[1]);
+		final float slope1 = toFloat(vertexC[0] - vertexB[0]) / (vertexC[1] - vertexB[1]);
 		
 		float x0 = vertexC[0];
 		float x1 = vertexC[0] + 0.5F;
@@ -123,23 +182,21 @@ final class Rasterizer {
 		final int yEnd = vertexA[1];
 		final int yLength = yStart - yEnd;
 		
-		final int[][][] lines = new int[yLength][][];
+		final int[][][] scanLines = new int[yLength][][];
 		
 		for(int i = 0, y = yStart; y > yEnd; i++, y--) {
-			final int[][] line = rasterizeLine((int)(x0), y, (int)(x1), y);
-			
-			lines[i] = line;
+			scanLines[i] = rasterizeLine(toInt(x0), y, toInt(x1), y, resolutionX, resolutionY);
 			
 			x0 -= slope0;
 			x1 -= slope1;
 		}
 		
-		return lines;
+		return scanLines;
 	}
 	
-	private static int[][][] doRasterizeTriangleTopDown(final int[] vertexA, final int[] vertexB, final int[] vertexC) {
-		final float slope0 = (float)(vertexB[0] - vertexA[0]) / (float)(vertexB[1] - vertexA[1]);
-		final float slope1 = (float)(vertexC[0] - vertexA[0]) / (float)(vertexC[1] - vertexA[1]);
+	private static int[][][] doRasterizeTriangleTopDown(final int[] vertexA, final int[] vertexB, final int[] vertexC, final int resolutionX, final int resolutionY) {
+		final float slope0 = toFloat(vertexB[0] - vertexA[0]) / (vertexB[1] - vertexA[1]);
+		final float slope1 = toFloat(vertexC[0] - vertexA[0]) / (vertexC[1] - vertexA[1]);
 		
 		float x0 = vertexA[0];
 		float x1 = vertexA[0] + 0.5F;
@@ -148,18 +205,16 @@ final class Rasterizer {
 		final int yEnd = vertexB[1];
 		final int yLength = yEnd - yStart + 1;
 		
-		final int[][][] lines = new int[yLength][][];
+		final int[][][] scanLines = new int[yLength][][];
 		
 		for(int i = 0, y = yStart; y <= yEnd; i++, y++) {
-			final int[][] line = rasterizeLine((int)(x0), y, (int)(x1), y);
-			
-			lines[i] = line;
+			scanLines[i] = rasterizeLine(toInt(x0), y, toInt(x1), y, resolutionX, resolutionY);
 			
 			x0 += slope0;
 			x1 += slope1;
 		}
 		
-		return lines;
+		return scanLines;
 	}
 	
 	private static void doSortVerticesAscendingByY(final int[][] vertices) {
