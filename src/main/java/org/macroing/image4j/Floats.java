@@ -80,6 +80,16 @@ final class Floats {
 	}
 	
 	/**
+	 * Returns the smallest (closest to negative infinity) {@code float} value that is greater than or equal to {@code value} and is equal to a mathematical integer.
+	 * 
+	 * @param value a value
+	 * @return the largest (closest to negative infinity) {@code float} value that is greater than or equal to {@code value} and is equal to a mathematical integer
+	 */
+	public static float ceil(final float value) {
+		return toFloat(Math.ceil(value));
+	}
+	
+	/**
 	 * Returns Euler's number {@code e} raised to the power of {@code exponent}.
 	 * 
 	 * @param exponent the exponent to raise {@code e} to

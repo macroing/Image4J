@@ -152,6 +152,65 @@ public final class Image {
 	}
 	
 	/**
+	 * Returns the {@link Color} of the pixel represented by {@code x} and {@code y}.
+	 * <p>
+	 * This method performs bilinear interpolation on the four closest {@code Color}s.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.getColor(x, y, PixelOperation.NO_CHANGE);
+	 * }
+	 * </pre>
+	 * 
+	 * @param x the X-coordinate of the pixel
+	 * @param y the Y-coordinate of the pixel
+	 * @return the {@code Color} of the pixel represented by {@code x} and {@code y}
+	 */
+	public Color getColor(final float x, final float y) {
+		return getColor(x, y, PixelOperation.NO_CHANGE);
+	}
+	
+	/**
+	 * Returns the {@link Color} of the pixel represented by {@code x} and {@code y}.
+	 * <p>
+	 * This method performs bilinear interpolation on the four closest {@code Color}s.
+	 * <p>
+	 * If {@code pixelOperation} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * See the documentation for {@link PixelOperation} to get a more detailed explanation for different pixel operations.
+	 * 
+	 * @param x the X-coordinate of the pixel
+	 * @param y the Y-coordinate of the pixel
+	 * @param pixelOperation the {@code PixelOperation} to use
+	 * @return the {@code Color} of the pixel represented by {@code x} and {@code y}
+	 * @throws NullPointerException thrown if, and only if, {@code pixelOperation} is {@code null}
+	 */
+	public Color getColor(final float x, final float y, final PixelOperation pixelOperation) {
+		final int minimumX = Integers.toInt(Floats.floor(x));
+		final int maximumX = Integers.toInt(Floats.ceil(x));
+		
+		final int minimumY = Integers.toInt(Floats.floor(y));
+		final int maximumY = Integers.toInt(Floats.ceil(y));
+		
+		if(minimumX == maximumX && minimumY == maximumY) {
+			return getColor(minimumX, minimumY, pixelOperation);
+		}
+		
+		final Color color00 = getColor(minimumX, minimumY, pixelOperation);
+		final Color color01 = getColor(maximumX, minimumY, pixelOperation);
+		final Color color10 = getColor(minimumX, maximumY, pixelOperation);
+		final Color color11 = getColor(maximumX, maximumY, pixelOperation);
+		
+		final float xFactor = x - minimumX;
+		final float yFactor = y - minimumY;
+		
+		final Color color = Color.blend(Color.blend(color00, color01, xFactor), Color.blend(color10, color11, xFactor), yFactor);
+		
+		return color;
+	}
+	
+	/**
 	 * Returns the {@link Color} of the pixel represented by {@code index}.
 	 * <p>
 	 * Calling this method is equivalent to the following:
@@ -1417,6 +1476,34 @@ public final class Image {
 	}
 	
 	/**
+	 * Redoes gamma correction on this {@code Image} instance using {@code RGBColorSpace.SRGB}.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.redoGammaCorrection(RGBColorSpace.SRGB);
+	 * }
+	 * </pre>
+	 */
+	public void redoGammaCorrection() {
+		redoGammaCorrection(RGBColorSpace.SRGB);
+	}
+	
+	/**
+	 * Redoes gamma correction on this {@code Image} instance using {@code colorSpace}.
+	 * <p>
+	 * If {@code colorSpace} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param colorSpace the {@link RGBColorSpace} to use
+	 * @throws NullPointerException thrown if, and only if, {@code colorSpace} is {@code null}
+	 */
+	public void redoGammaCorrection(final RGBColorSpace colorSpace) {
+		Objects.requireNonNull(colorSpace, "colorSpace == null");
+		
+		update(color -> color.redoGammaCorrection(colorSpace));
+	}
+	
+	/**
 	 * Saves this {@code Image} as a .PNG image to the file represented by {@code file}.
 	 * <p>
 	 * If {@code file} is {@code null}, a {@code NullPointerException} will be thrown.
@@ -1597,6 +1684,34 @@ public final class Image {
 		this.resolutionY = newResolutionY;
 		this.colors = newColors;
 		this.sampleCounts = newSampleCounts;
+	}
+	
+	/**
+	 * Undoes gamma correction on this {@code Image} instance using {@code RGBColorSpace.SRGB}.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * image.undoGammaCorrection(RGBColorSpace.SRGB);
+	 * }
+	 * </pre>
+	 */
+	public void undoGammaCorrection() {
+		undoGammaCorrection(RGBColorSpace.SRGB);
+	}
+	
+	/**
+	 * Undoes gamma correction on this {@code Image} instance using {@code colorSpace}.
+	 * <p>
+	 * If {@code colorSpace} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param colorSpace the {@link RGBColorSpace} to use
+	 * @throws NullPointerException thrown if, and only if, {@code colorSpace} is {@code null}
+	 */
+	public void undoGammaCorrection(final RGBColorSpace colorSpace) {
+		Objects.requireNonNull(colorSpace, "colorSpace == null");
+		
+		update(color -> color.redoGammaCorrection(colorSpace));
 	}
 	
 	/**
