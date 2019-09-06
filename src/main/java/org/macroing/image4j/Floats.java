@@ -52,7 +52,7 @@ final class Floats {
 	 * @return the absolute version of {@code value}
 	 */
 	public static float abs(final float value) {
-		return toFloat(Math.abs(value));
+		return Math.abs(value);
 	}
 	
 	/**
@@ -83,7 +83,7 @@ final class Floats {
 	 * Returns the smallest (closest to negative infinity) {@code float} value that is greater than or equal to {@code value} and is equal to a mathematical integer.
 	 * 
 	 * @param value a value
-	 * @return the largest (closest to negative infinity) {@code float} value that is greater than or equal to {@code value} and is equal to a mathematical integer
+	 * @return the smallest (closest to negative infinity) {@code float} value that is greater than or equal to {@code value} and is equal to a mathematical integer
 	 */
 	public static float ceil(final float value) {
 		return toFloat(Math.ceil(value));

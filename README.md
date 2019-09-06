@@ -80,7 +80,7 @@ public class FillAndDrawExample {
 }
 ```
 
-The following example creates an empty image, fills it will a circle and two triangles and saves the result to your hard drive.
+The following example creates an empty image, fills it with a circle and two triangles and saves the result to your hard drive.
 ```java
 import org.macroing.image4j.Color;
 import org.macroing.image4j.Image;
