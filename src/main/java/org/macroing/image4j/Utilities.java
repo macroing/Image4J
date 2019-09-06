@@ -18,18 +18,62 @@
  */
 package org.macroing.image4j;
 
+import java.text.DecimalFormat;
+import java.util.IllegalFormatException;
+
 /**
- * A class that consists exclusively of static methods that returns or performs various operations on arrays.
+ * A class that consists exclusively of static utility methods.
  * 
  * @since 1.0.0
  * @author J&#246;rgen Lundgren
  */
-final class Arrays2 {
-	private Arrays2() {
+final class Utilities {
+	private static final DecimalFormat DECIMAL_FORMAT = doCreateDecimalFormat();
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private Utilities() {
 		
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * Returns a {@code String} representation of {@code value} without scientific notation.
+	 * 
+	 * @param value a {@code float} value
+	 * @return a {@code String} representation of {@code value} without scientific notation
+	 */
+	public static String toNonScientificNotation(final float value) {
+		return DECIMAL_FORMAT.format(value).replace(',', '.');
+	}
+	
+	/**
+	 * Checks that {@code object} is not {@code null}.
+	 * <p>
+	 * Returns {@code object}, if it is not {@code null}.
+	 * <p>
+	 * If {@code object} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * The message to the {@code NullPointerException} is created by {@code String.format(format, args)}. This only happens when {@code object} is {@code null}.
+	 * <p>
+	 * If {@code String.format(format, args)} fails, an {@code IllegalFormatException} will be thrown.
+	 * 
+	 * @param <T> the generic type of {@code object}
+	 * @param object the {@code Object} to check
+	 * @param format a format string
+	 * @param args arguments referenced by the format specifiers in the format string
+	 * @return {@code object}, if it is not {@code null}
+	 * @throws IllegalFormatException thrown if, and only if, {@code String.format(format, args)} fails
+	 * @throws NullPointerException thrown if, and only if, {@code object} is {@code null}
+	 */
+	public static <T> T requireNonNull(final T object, final String format, final Object... args) {
+		if(object == null) {
+			throw new NullPointerException(String.format(format, args));
+		}
+		
+		return object;
+	}
 	
 	/**
 	 * Checks that {@code array} and all of its elements are not {@code null}.
@@ -106,6 +150,48 @@ final class Arrays2 {
 	}
 	
 	/**
+	 * Checks that {@code value} is valid.
+	 * <p>
+	 * Returns {@code value}, if it is valid.
+	 * <p>
+	 * If either {@code Float.isInfinite(value)} or {@code Float.isNaN(value)} returns {@code true}, an {@code IllegalArgumentException} will be thrown.
+	 * 
+	 * @param value a {@code float} value
+	 * @param variableName the name of the variable to check, which will be part of the message supplied to the {@code IllegalArgumentException}
+	 * @return {@code value}, if it is valid
+	 * @throws IllegalArgumentException thrown if, and only if, either {@code Float.isInfinite(value)} or {@code Float.isNaN(value)} returns {@code true}
+	 */
+	public static float requireFiniteFloatValue(final float value, final String variableName) {
+		if(Float.isInfinite(value)) {
+			throw new IllegalArgumentException(String.format("Float.isInfinite(%s) == true: %s=%s", variableName, variableName, Float.toString(value)));
+		} else if(Float.isNaN(value)) {
+			throw new IllegalArgumentException(String.format("Float.isNaN(%s) == true: %s=%s", variableName, variableName, Float.toString(value)));
+		}
+		
+		return value;
+	}
+	
+	/**
+	 * Checks that {@code value} is positive.
+	 * <p>
+	 * Returns {@code value}, if it is positive.
+	 * <p>
+	 * If {@code value < 0}, an {@code IllegalArgumentException} will be thrown.
+	 * 
+	 * @param value an {@code int} value
+	 * @param variableName the name of the variable to check, which will be part of the message supplied to the {@code IllegalArgumentException}
+	 * @return {@code value}, if it is positive
+	 * @throws IllegalArgumentException thrown if, and only if, {@code value < 0}
+	 */
+	public static int requirePositiveIntValue(final int value, final String variableName) {
+		if(value < 0) {
+			throw new IllegalArgumentException(String.format("%s < 0: %s=%s", variableName, variableName, Integer.toString(value)));
+		}
+		
+		return value;
+	}
+	
+	/**
 	 * Checks that {@code array.length == expectedLength}.
 	 * <p>
 	 * Returns {@code array}.
@@ -127,5 +213,18 @@ final class Arrays2 {
 		}
 		
 		return array;
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private static DecimalFormat doCreateDecimalFormat() {
+		final
+		DecimalFormat decimalFormat = new DecimalFormat("#");
+		decimalFormat.setDecimalSeparatorAlwaysShown(true);
+		decimalFormat.setMaximumFractionDigits(8);
+		decimalFormat.setMinimumFractionDigits(1);
+		decimalFormat.setMinimumIntegerDigits(1);
+		
+		return decimalFormat;
 	}
 }

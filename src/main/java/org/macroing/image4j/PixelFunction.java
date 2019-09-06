@@ -18,10 +18,12 @@
  */
 package org.macroing.image4j;
 
-import static org.macroing.image4j.Floats.max;
-import static org.macroing.image4j.Floats.min;
+import static org.macroing.math4j.MathF.max;
+import static org.macroing.math4j.MathF.min;
 
 import java.util.Objects;
+
+import org.macroing.math4j.NoiseGeneratorF;
 
 /**
  * A {@code PixelFunction} is a function that returns a {@link Color} for a given pixel.
@@ -206,7 +208,7 @@ public interface PixelFunction {
 			final float noiseX = (x - minimumX) / (maximumX - minimumX);
 			final float noiseY = (y - minimumY) / (maximumY - minimumY);
 			
-			final float noise = NoiseGenerator.simplexFractionalBrownianMotion(noiseX, noiseY, frequency, gain, 0.0F, 1.0F, octaves);
+			final float noise = NoiseGeneratorF.simplexFractionalBrownianMotion(noiseX, noiseY, frequency, gain, 0.0F, 1.0F, octaves);
 			
 			return color.multiply(noise).minTo0().maxTo1().redoGammaCorrection();
 		};

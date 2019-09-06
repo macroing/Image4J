@@ -1,3 +1,9 @@
+2019-09-06  Jörgen Lundgren  <joergen.lundgren@macroing.org>
+
+	* CHANGE:	Update version to 0.0.2.
+	* CHANGE:	Move functionality provided by this library to Math4J. Most of these changes are internal. Except for the classes Angle and NoiseGenerator. These are now called AngleF and NoiseGeneratorF and can be found in Math4J.
+	* CHANGE:	Add a dependency to a new library called Math4J.
+
 2019-09-01  Jörgen Lundgren  <joergen.lundgren@macroing.org>
 
 	* ADD:		The Image class has two new methods to set a Color given a pixel representation (X- and Y-coordinates or index). These are setColor(int, Color, PixelOperation) and setColor(int, int, Color, PixelOperation).

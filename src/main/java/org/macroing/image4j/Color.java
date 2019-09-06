@@ -18,10 +18,13 @@
  */
 package org.macroing.image4j;
 
-import static org.macroing.image4j.Floats.exp;
-import static org.macroing.image4j.Integers.toInt;
+import static org.macroing.math4j.MathF.exp;
+import static org.macroing.math4j.MathI.toInt;
 
 import java.util.Objects;
+
+import org.macroing.math4j.MathF;
+import org.macroing.math4j.MathI;
 
 /**
  * A {@code Color} encapsulates a color in the default {@code sRGB} color space.
@@ -195,10 +198,10 @@ public final class Color {
 	 * @throws IllegalArgumentException thrown if, and only if, either {@code r}, {@code g}, {@code b} or {@code a} are invalid
 	 */
 	public Color(final float r, final float g, final float b, final float a) {
-		this.r = Floats.requireFiniteFloatValue(r, "r");
-		this.g = Floats.requireFiniteFloatValue(g, "g");
-		this.b = Floats.requireFiniteFloatValue(b, "b");
-		this.a = Floats.requireFiniteFloatValue(a, "a");
+		this.r = Utilities.requireFiniteFloatValue(r, "r");
+		this.g = Utilities.requireFiniteFloatValue(g, "g");
+		this.b = Utilities.requireFiniteFloatValue(b, "b");
+		this.a = Utilities.requireFiniteFloatValue(a, "a");
 	}
 	
 	/**
@@ -568,7 +571,7 @@ public final class Color {
 	 * @return a new {@code Color} instance with the result of the addition, or this {@code Color} instance if no addition occurred
 	 */
 	public Color minTo0() {
-		final float minimumComponentValue = Floats.min(this.r, this.g, this.b);
+		final float minimumComponentValue = MathF.min(this.r, this.g, this.b);
 		
 		if(minimumComponentValue < 0.0F) {
 			final float r = this.r + -minimumComponentValue;
@@ -721,9 +724,9 @@ public final class Color {
 	 * @return a new {@code Color} instance with the result of the saturation
 	 */
 	public Color saturate(final float edgeA, final float edgeB) {
-		final float r = Floats.saturate(this.r, edgeA, edgeB);
-		final float g = Floats.saturate(this.g, edgeA, edgeB);
-		final float b = Floats.saturate(this.b, edgeA, edgeB);
+		final float r = MathF.saturate(this.r, edgeA, edgeB);
+		final float g = MathF.saturate(this.g, edgeA, edgeB);
+		final float b = MathF.saturate(this.b, edgeA, edgeB);
 		final float a = this.a;
 		
 		return new Color(r, g, b, a);
@@ -847,14 +850,14 @@ public final class Color {
 	 * @return a new {@code Color} instance with the result of the tone mapping operation
 	 */
 	public Color toneMappingFilmicCurve(final float exposure, final float a, final float b, final float c, final float d, final float e, final float subtract, final float minimum) {
-		final float oldR = Floats.max(this.r * exposure - subtract, minimum);
-		final float oldG = Floats.max(this.g * exposure - subtract, minimum);
-		final float oldB = Floats.max(this.b * exposure - subtract, minimum);
+		final float oldR = MathF.max(this.r * exposure - subtract, minimum);
+		final float oldG = MathF.max(this.g * exposure - subtract, minimum);
+		final float oldB = MathF.max(this.b * exposure - subtract, minimum);
 		final float oldA = this.a;
 		
-		final float newR = Floats.saturate((oldR * (a * oldR + b)) / (oldR * (c * oldR + d) + e));
-		final float newG = Floats.saturate((oldG * (a * oldG + b)) / (oldG * (c * oldG + d) + e));
-		final float newB = Floats.saturate((oldB * (a * oldB + b)) / (oldB * (c * oldB + d) + e));
+		final float newR = MathF.saturate((oldR * (a * oldR + b)) / (oldR * (c * oldR + d) + e));
+		final float newG = MathF.saturate((oldG * (a * oldG + b)) / (oldG * (c * oldG + d) + e));
+		final float newB = MathF.saturate((oldB * (a * oldB + b)) / (oldB * (c * oldB + d) + e));
 		final float newA = oldA;
 		
 		return new Color(newR, newG, newB, newA);
@@ -1191,7 +1194,7 @@ public final class Color {
 	 * @return the largest R-, G- or B-component value
 	 */
 	public float max() {
-		return Floats.max(this.r, this.g, this.b);
+		return MathF.max(this.r, this.g, this.b);
 	}
 	
 	/**
@@ -1200,7 +1203,7 @@ public final class Color {
 	 * @return the smallest R-, G- or B-component value
 	 */
 	public float min() {
-		return Floats.min(this.r, this.g, this.b);
+		return MathF.min(this.r, this.g, this.b);
 	}
 	
 	/**
@@ -1344,9 +1347,9 @@ public final class Color {
 	 * @throws NullPointerException thrown if, and only if, either {@code color0} or {@code color1} are {@code null}
 	 */
 	public static Color blend(final Color colorA, final Color colorB, final float factorR, final float factorG, final float factorB) {
-		final float r = Floats.lerp(colorA.r, colorB.r, factorR);
-		final float g = Floats.lerp(colorA.g, colorB.g, factorG);
-		final float b = Floats.lerp(colorA.b, colorB.b, factorB);
+		final float r = MathF.lerp(colorA.r, colorB.r, factorR);
+		final float g = MathF.lerp(colorA.g, colorB.g, factorG);
+		final float b = MathF.lerp(colorA.b, colorB.b, factorB);
 		
 		return new Color(r, g, b);
 	}
@@ -1374,7 +1377,7 @@ public final class Color {
 	 * @return a random {@code Color} instance
 	 */
 	public static Color random(final float a) {
-		return new Color(Floats.nextFloat(), Floats.nextFloat(), Floats.nextFloat(), a);
+		return new Color(MathF.random(), MathF.random(), MathF.random(), a);
 	}
 	
 	/**
@@ -1400,7 +1403,7 @@ public final class Color {
 	 * @return a random blue {@code Color} instance
 	 */
 	public static Color randomBlue(final float a) {
-		return new Color(0.0F, 0.0F, Floats.nextFloat(), a);
+		return new Color(0.0F, 0.0F, MathF.random(), a);
 	}
 	
 	/**
@@ -1426,7 +1429,7 @@ public final class Color {
 	 * @return a random gray {@code Color} instance
 	 */
 	public static Color randomGray(final float a) {
-		return new Color(Floats.nextFloat(), a);
+		return new Color(MathF.random(), a);
 	}
 	
 	/**
@@ -1452,7 +1455,7 @@ public final class Color {
 	 * @return a random green {@code Color} instance
 	 */
 	public static Color randomGreen(final float a) {
-		return new Color(0.0F, Floats.nextFloat(), 0.0F, a);
+		return new Color(0.0F, MathF.random(), 0.0F, a);
 	}
 	
 	/**
@@ -1478,16 +1481,16 @@ public final class Color {
 	 * @return a random red {@code Color} instance
 	 */
 	public static Color randomRed(final float a) {
-		return new Color(Floats.nextFloat(), 0.0F, 0.0F, a);
+		return new Color(MathF.random(), 0.0F, 0.0F, a);
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private static float doConvertComponentValueFromIntToFloat(final int componentValue) {
-		return Integers.saturate(componentValue) / 255.0F;
+		return MathI.saturate(componentValue) / 255.0F;
 	}
 	
 	private static int doConvertComponentValueFromFloatToInt(final float componentValue) {
-		return toInt(Floats.saturate(componentValue) * 255.0F + 0.5F);
+		return toInt(MathF.saturate(componentValue) * 255.0F + 0.5F);
 	}
 }

@@ -18,8 +18,8 @@
  */
 package org.macroing.image4j;
 
-import static org.macroing.image4j.Integers.max;
-import static org.macroing.image4j.Integers.min;
+import static org.macroing.math4j.MathI.max;
+import static org.macroing.math4j.MathI.min;
 
 /**
  * A class that consists exclusively of static methods that performs various operations on geometric primitives.

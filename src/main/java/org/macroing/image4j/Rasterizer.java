@@ -18,9 +18,9 @@
  */
 package org.macroing.image4j;
 
-import static org.macroing.image4j.Floats.toFloat;
-import static org.macroing.image4j.Integers.abs;
-import static org.macroing.image4j.Integers.toInt;
+import static org.macroing.math4j.MathF.toFloat;
+import static org.macroing.math4j.MathI.abs;
+import static org.macroing.math4j.MathI.toInt;
 
 /**
  * A class that performs rasterization on lines and triangles.

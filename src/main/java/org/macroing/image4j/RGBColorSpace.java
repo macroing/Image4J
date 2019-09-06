@@ -18,9 +18,9 @@
  */
 package org.macroing.image4j;
 
-import static org.macroing.image4j.Floats.pow;
-import static org.macroing.image4j.Integers.saturate;
-import static org.macroing.image4j.Integers.toInt;
+import static org.macroing.math4j.MathF.pow;
+import static org.macroing.math4j.MathI.saturate;
+import static org.macroing.math4j.MathI.toInt;
 
 /**
  * An {@code RGBColorSpace} is an RGB color space.

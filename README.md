@@ -1,4 +1,4 @@
-Image4J v.0.0.1
+Image4J v.0.0.2
 ===============
 Image4J is an image processing library for Java.
 
@@ -106,7 +106,7 @@ The following example creates an empty image, fills the image with colors genera
 ```java
 import org.macroing.image4j.Color;
 import org.macroing.image4j.Image;
-import org.macroing.image4j.NoiseGenerator;
+import org.macroing.math4j.NoiseGeneratorF;
 
 public class NoiseExample {
     public static void main(String[] args) {
@@ -118,7 +118,7 @@ public class NoiseExample {
             float x = (index % image.getResolutionX()) / (float)(image.getResolutionX());
             float y = (index / image.getResolutionX()) / (float)(image.getResolutionY());
             
-            float noise = NoiseGenerator.simplexFractionalBrownianMotion(x, y, 5.0F, 0.5F, 0.0F, 1.0F, 16);
+            float noise = NoiseGeneratorF.simplexFractionalBrownianMotion(x, y, 5.0F, 0.5F, 0.0F, 1.0F, 16);
             
             Color color = base.multiply(noise).minTo0().maxTo1().redoGammaCorrection();
             
@@ -148,7 +148,8 @@ public class UpdateExample {
 
 Dependencies
 ------------
- - [Java 8](http://www.java.com).
+ - [Java 8](http://www.java.com)
+ - [Math4J](https://github.com/macroing/Math4J)
 
 Note
 ----

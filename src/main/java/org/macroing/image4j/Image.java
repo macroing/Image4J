@@ -18,10 +18,14 @@
  */
 package org.macroing.image4j;
 
-import static org.macroing.image4j.Floats.max;
-import static org.macroing.image4j.Floats.min;
-import static org.macroing.image4j.Integers.max;
-import static org.macroing.image4j.Integers.min;
+import static org.macroing.math4j.MathF.ceil;
+import static org.macroing.math4j.MathF.floor;
+import static org.macroing.math4j.MathF.max;
+import static org.macroing.math4j.MathF.min;
+import static org.macroing.math4j.MathI.max;
+import static org.macroing.math4j.MathI.min;
+import static org.macroing.math4j.MathI.modulo;
+import static org.macroing.math4j.MathI.toInt;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -101,9 +105,9 @@ public final class Image {
 	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
 	 */
 	public Image(final int resolutionX, final int resolutionY, final Color color) {
-		this.resolutionX = Integers.requirePositiveIntValue(resolutionX, "resolutionX");
-		this.resolutionY = Integers.requirePositiveIntValue(resolutionY, "resolutionY");
-		this.resolution = Integers.requirePositiveIntValue(resolutionX * resolutionY, "(resolutionX * resolutionY)");
+		this.resolutionX = Utilities.requirePositiveIntValue(resolutionX, "resolutionX");
+		this.resolutionY = Utilities.requirePositiveIntValue(resolutionY, "resolutionY");
+		this.resolution = Utilities.requirePositiveIntValue(resolutionX * resolutionY, "(resolutionX * resolutionY)");
 		this.colors = new Color[this.resolution];
 		this.sampleCounts = new int[this.resolution];
 		
@@ -126,10 +130,10 @@ public final class Image {
 	 * @throws NullPointerException thrown if, and only if, either {@code colors} or at least one of its elements are {@code null}
 	 */
 	public Image(final int resolutionX, final int resolutionY, final Color[] colors) {
-		this.resolutionX = Integers.requirePositiveIntValue(resolutionX, "resolutionX");
-		this.resolutionY = Integers.requirePositiveIntValue(resolutionY, "resolutionY");
-		this.resolution = Integers.requirePositiveIntValue(this.resolutionX * this.resolutionY, "(resolutionX * resolutionY)");
-		this.colors = Arrays2.requireExactLength(Arrays2.requireDeepNonNull(colors, "colors"), this.resolution, "colors").clone();
+		this.resolutionX = Utilities.requirePositiveIntValue(resolutionX, "resolutionX");
+		this.resolutionY = Utilities.requirePositiveIntValue(resolutionY, "resolutionY");
+		this.resolution = Utilities.requirePositiveIntValue(this.resolutionX * this.resolutionY, "(resolutionX * resolutionY)");
+		this.colors = Utilities.requireExactLength(Utilities.requireDeepNonNull(colors, "colors"), this.resolution, "colors").clone();
 		this.sampleCounts = new int[this.resolution];
 	}
 	
@@ -187,11 +191,11 @@ public final class Image {
 	 * @throws NullPointerException thrown if, and only if, {@code pixelOperation} is {@code null}
 	 */
 	public Color getColor(final float x, final float y, final PixelOperation pixelOperation) {
-		final int minimumX = Integers.toInt(Floats.floor(x));
-		final int maximumX = Integers.toInt(Floats.ceil(x));
+		final int minimumX = toInt(floor(x));
+		final int maximumX = toInt(ceil(x));
 		
-		final int minimumY = Integers.toInt(Floats.floor(y));
-		final int maximumY = Integers.toInt(Floats.ceil(y));
+		final int minimumY = toInt(floor(y));
+		final int maximumY = toInt(ceil(y));
 		
 		if(minimumX == maximumX && minimumY == maximumY) {
 			return getColor(minimumX, minimumY, pixelOperation);
@@ -391,8 +395,8 @@ public final class Image {
 //			In this case the cropped Image, Image B, is outside the original Image, Image A. This means we need to perform at least one repetition operation and therefore cannot use System.arraycopy(...), which is much faster.
 			for(int imageAY = imageAMinimumY, imageBY = imageBMinimumY; imageAY < imageAMaximumY && imageBY < imageBMaximumY; imageAY++, imageBY++) {
 				for(int imageAX = imageAMinimumX, imageBX = imageBMinimumX; imageAX < imageAMaximumX && imageBX < imageBMaximumX; imageAX++, imageBX++) {
-					final int currentImageAX = isRepeatingX ? Integers.modulo(imageAX, imageA.resolutionX) : imageAX;
-					final int currentImageAY = isRepeatingY ? Integers.modulo(imageAY, imageA.resolutionY) : imageAY;
+					final int currentImageAX = isRepeatingX ? modulo(imageAX, imageA.resolutionX) : imageAX;
+					final int currentImageAY = isRepeatingY ? modulo(imageAY, imageA.resolutionY) : imageAY;
 					
 					final Color currentColor = currentImageAX >= 0 && currentImageAX < imageA.resolutionX && currentImageAY >= 0 && currentImageAY < imageA.resolutionY ? imageA.colors[currentImageAY * imageA.resolutionX + currentImageAX] : color;
 					
@@ -680,7 +684,7 @@ public final class Image {
 		Objects.requireNonNull(array, "array == null");
 		Objects.requireNonNull(arrayComponentOrder, "arrayComponentOrder == null");
 		
-		Arrays2.requireExactLength(array, this.colors.length * arrayComponentOrder.getComponentCount(), "array");
+		Utilities.requireExactLength(array, this.colors.length * arrayComponentOrder.getComponentCount(), "array");
 		
 		for(int i = 0, j = 0; i < this.colors.length; i++, j += arrayComponentOrder.getComponentCount()) {
 			final Color color = this.colors[i];
@@ -1658,9 +1662,9 @@ public final class Image {
 		
 		final int[] oldSampleCounts = this.sampleCounts;
 		
-		final int newResolutionX = Integers.requirePositiveIntValue(resolutionX, "resolutionX");
-		final int newResolutionY = Integers.requirePositiveIntValue(resolutionY, "resolutionY");
-		final int newResolution = Integers.requirePositiveIntValue(resolutionX * resolutionY, "(resolutionX * resolutionY)");
+		final int newResolutionX = Utilities.requirePositiveIntValue(resolutionX, "resolutionX");
+		final int newResolutionY = Utilities.requirePositiveIntValue(resolutionY, "resolutionY");
+		final int newResolution = Utilities.requirePositiveIntValue(resolutionX * resolutionY, "(resolutionX * resolutionY)");
 		
 		final Color[] newColors = new Color[newResolution];
 		
@@ -1756,7 +1760,7 @@ public final class Image {
 		for(int y = minimumY; y < maximumY; y++) {
 			for(int x = minimumX; x < maximumX; x++) {
 				final Color oldColor = doGetColorOrDefault(x, y, Color.BLACK);
-				final Color newColor = Objects2.requireNonNull(function.apply(oldColor), "function.apply(%s) == null: x=%s, y=%s", oldColor, Integer.valueOf(x), Integer.valueOf(y));
+				final Color newColor = Utilities.requireNonNull(function.apply(oldColor), "function.apply(%s) == null: x=%s, y=%s", oldColor, Integer.valueOf(x), Integer.valueOf(y));
 				
 				doSetColor(x, y, newColor);
 			}
@@ -1972,14 +1976,14 @@ public final class Image {
 	 * @throws NullPointerException thrown if, and only if, either {@code array} or {@code arrayComponentOrder} are {@code null}
 	 */
 	public static Image toImage(final int resolutionX, final int resolutionY, final byte[] array, final ArrayComponentOrder arrayComponentOrder) {
-		Integers.requirePositiveIntValue(resolutionX, "resolutionX");
-		Integers.requirePositiveIntValue(resolutionY, "resolutionY");
-		Integers.requirePositiveIntValue(resolutionX * resolutionY, "(resolutionX * resolutionY)");
+		Utilities.requirePositiveIntValue(resolutionX, "resolutionX");
+		Utilities.requirePositiveIntValue(resolutionY, "resolutionY");
+		Utilities.requirePositiveIntValue(resolutionX * resolutionY, "(resolutionX * resolutionY)");
 		
 		Objects.requireNonNull(array, "array == null");
 		Objects.requireNonNull(arrayComponentOrder, "arrayComponentOrder == null");
 		
-		Arrays2.requireExactLength(Objects.requireNonNull(array, "array == null"), resolutionX * resolutionY * arrayComponentOrder.getComponentCount(), "array");
+		Utilities.requireExactLength(Objects.requireNonNull(array, "array == null"), resolutionX * resolutionY * arrayComponentOrder.getComponentCount(), "array");
 		
 		final Color[] colors = doConvertByteArrayToColorArray(array, arrayComponentOrder);
 		
@@ -2029,14 +2033,14 @@ public final class Image {
 	 * @throws NullPointerException thrown if, and only if, either {@code array} or {@code arrayComponentOrder} are {@code null}
 	 */
 	public static Image toImage(final int resolutionX, final int resolutionY, final int[] array, final ArrayComponentOrder arrayComponentOrder) {
-		Integers.requirePositiveIntValue(resolutionX, "resolutionX");
-		Integers.requirePositiveIntValue(resolutionY, "resolutionY");
-		Integers.requirePositiveIntValue(resolutionX * resolutionY, "(resolutionX * resolutionY)");
+		Utilities.requirePositiveIntValue(resolutionX, "resolutionX");
+		Utilities.requirePositiveIntValue(resolutionY, "resolutionY");
+		Utilities.requirePositiveIntValue(resolutionX * resolutionY, "(resolutionX * resolutionY)");
 		
 		Objects.requireNonNull(array, "array == null");
 		Objects.requireNonNull(arrayComponentOrder, "arrayComponentOrder == null");
 		
-		Arrays2.requireExactLength(array, resolutionX * resolutionY * arrayComponentOrder.getComponentCount(), "array");
+		Utilities.requireExactLength(array, resolutionX * resolutionY * arrayComponentOrder.getComponentCount(), "array");
 		
 		final Color[] colors = doConvertIntArrayToColorArray(array, arrayComponentOrder);
 		
@@ -2059,14 +2063,14 @@ public final class Image {
 	 * @throws NullPointerException thrown if, and only if, either {@code array} or {@code packedIntComponentOrder} are {@code null}
 	 */
 	public static Image toImage(final int resolutionX, final int resolutionY, final int[] array, final PackedIntComponentOrder packedIntComponentOrder) {
-		Integers.requirePositiveIntValue(resolutionX, "resolutionX");
-		Integers.requirePositiveIntValue(resolutionY, "resolutionY");
-		Integers.requirePositiveIntValue(resolutionX * resolutionY, "(resolutionX * resolutionY)");
+		Utilities.requirePositiveIntValue(resolutionX, "resolutionX");
+		Utilities.requirePositiveIntValue(resolutionY, "resolutionY");
+		Utilities.requirePositiveIntValue(resolutionX * resolutionY, "(resolutionX * resolutionY)");
 		
 		Objects.requireNonNull(array, "array == null");
 		Objects.requireNonNull(packedIntComponentOrder, "packedIntComponentOrder == null");
 		
-		Arrays2.requireExactLength(array, resolutionX * resolutionY, "array");
+		Utilities.requireExactLength(array, resolutionX * resolutionY, "array");
 		
 		final Color[] colors = doConvertIntArrayToColorArray(array, packedIntComponentOrder);
 		

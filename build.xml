@@ -6,18 +6,23 @@
 	<property name="project.directory.root" location="."/>
 	<property name="project.name" value="${ant.project.name}"/>
 	<property name="project.vendor" value="Macroing.org"/>
-	<property name="project.version" value="0.0.1"/>
+	<property name="project.version" value="0.0.2"/>
 	
 	<!--The following properties are based on the above properties and don't really need to change.-->
 	<property name="project.directory.binary" location="bin"/>
 	<property name="project.directory.distribution" location="${project.directory.root}/distribution"/>
 	<property name="project.directory.distribution.current" location="${project.directory.distribution}/${project.name}"/>
+	<property name="project.directory.library" location="lib"/>
 	<property name="project.directory.source" location="src/main/java"/>
 	
 	<target name="clean" description="Deletes generated directories and files for project ${project.name}.">
 		<delete dir="${project.directory.binary}"/>
 		<delete dir="${project.directory.distribution}"/>
 	</target>
+	
+	<path id="project.directory.library.path">
+		<fileset dir="${project.directory.library}" includes="**/*.jar"/>
+	</path>
 	
 	<target name="distribution" depends="clean">
 		<!--Initialize all directories.-->
@@ -26,7 +31,7 @@
 		<mkdir dir="${project.directory.source}"/>
 		
 		<!--Perform Java compilation.-->
-		<javac source="${java.source}" target="${java.target}" srcdir="${project.directory.source}" destdir="${project.directory.binary}" includeAntRuntime="false" encoding="UTF-8" debug="true" debuglevel="lines,vars,source">
+		<javac source="${java.source}" target="${java.target}" srcdir="${project.directory.source}" destdir="${project.directory.binary}" classpathref="project.directory.library.path" includeAntRuntime="false" encoding="UTF-8" debug="true" debuglevel="lines,vars,source">
 			<compilerarg value="-Xlint:all"/>
 		</javac>
 		
@@ -52,12 +57,14 @@
 		<!--Generate Javadocs.-->
 		<javadoc encoding="UTF-8" charset="UTF-8" docencoding="UTF-8" sourcepath="${project.directory.source}" destdir="${project.directory.distribution.current}/doc" author="true" version="true" use="true" access="protected" linksource="false" windowtitle="${project.name} API">
 			<classpath>
+				<path refid="project.directory.library.path"/>
 				<pathelement location="${project.directory.binary}"/>
 			</classpath>
 		</javadoc>
 		
 		<!--Copy files.-->
 		<copy todir="${project.directory.distribution.current}">
+			<fileset dir="." includes="ChangeLog.txt"/>
 			<fileset dir="." includes="COPYING"/>
 			<fileset dir="." includes="COPYING.LESSER"/>
 			<fileset dir="." includes="README.md"/>
@@ -66,6 +73,11 @@
 		<!--Copy the source code.-->
 		<copy todir="${project.directory.distribution.current}/src">
 			<fileset dir="${project.directory.source}"/>
+		</copy>
+		
+		<!--Copy the library dependencies.-->
+		<copy todir="${project.directory.distribution.current}/lib">
+			<fileset dir="${project.directory.library}"/>
 		</copy>
 	</target>
 </project>

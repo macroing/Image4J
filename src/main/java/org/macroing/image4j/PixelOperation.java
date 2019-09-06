@@ -18,6 +18,8 @@
  */
 package org.macroing.image4j;
 
+import static org.macroing.math4j.MathI.modulo;
+
 /**
  * A {@code PixelOperation} provides a set of operations to perform on a pixel when it is outside the boundaries of an {@link Image} instance.
  * <p>
@@ -91,7 +93,7 @@ public enum PixelOperation {
 			case NO_CHANGE:
 				return index;
 			case WRAP_AROUND:
-				return Integers.modulo(index, resolution);
+				return modulo(index, resolution);
 			default:
 				return index;
 		}
@@ -111,7 +113,7 @@ public enum PixelOperation {
 			case NO_CHANGE:
 				return x;
 			case WRAP_AROUND:
-				return Integers.modulo(x, resolutionX);
+				return modulo(x, resolutionX);
 			default:
 				return x;
 		}
@@ -131,7 +133,7 @@ public enum PixelOperation {
 			case NO_CHANGE:
 				return y;
 			case WRAP_AROUND:
-				return Integers.modulo(y, resolutionY);
+				return modulo(y, resolutionY);
 			default:
 				return y;
 		}
