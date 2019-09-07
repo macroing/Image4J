@@ -110,33 +110,33 @@ public final class RGBColorSpace {
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * Converts {@code color} from the RGB color space to the XYZ color space.
-	 * <p>
-	 * Returns a {@link Color} in the XYZ color space.
-	 * <p>
-	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
-	 * 
-	 * @param color the {@code Color} to convert
-	 * @return a {@code Color} in the XYZ color space
-	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
-	 */
-	public Color convertRGBToXYZ(final Color color) {
-		return this.matrixRGBToXYZ.convertRGBToXYZ(color);
-	}
-	
-	/**
-	 * Converts {@code color} from the XYZ color space to the RGB color space.
+	 * Converts {@code color} from the CIE XYZ color space to the RGB color space.
 	 * <p>
 	 * Returns a {@link Color} in the RGB color space.
 	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
 	 * 
-	 * @param color the {@code Color} to convert
+	 * @param color the {@code XYZColor} to convert
 	 * @return a {@code Color} in the RGB color space
 	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
 	 */
-	public Color convertXYZToRGB(final Color color) {
+	public Color convertXYZToRGB(final XYZColor color) {
 		return this.matrixXYZToRGB.convertXYZToRGB(color);
+	}
+	
+	/**
+	 * Converts {@code color} from the RGB color space to the CIE XYZ color space.
+	 * <p>
+	 * Returns an {@link XYZColor} in the CIE XYZ color space.
+	 * <p>
+	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param color the {@code Color} to convert
+	 * @return an {@code XYZColor} in the CIE XYZ color space
+	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
+	 */
+	public XYZColor convertRGBToXYZ(final Color color) {
+		return this.matrixRGBToXYZ.convertRGBToXYZ(color);
 	}
 	
 	/**
@@ -328,7 +328,7 @@ public final class RGBColorSpace {
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		public Color convertRGBToXYZ(final Color color) {
+		public XYZColor convertRGBToXYZ(final Color color) {
 			final float r = color.r;
 			final float g = color.g;
 			final float b = color.b;
@@ -337,7 +337,7 @@ public final class RGBColorSpace {
 			final float y = this.elementYR * r + this.elementYG * g + this.elementYB * b;
 			final float z = this.elementZR * r + this.elementZG * g + this.elementZB * b;
 			
-			return new Color(x, y, z);
+			return new XYZColor(x, y, z);
 		}
 	}
 	
@@ -377,10 +377,10 @@ public final class RGBColorSpace {
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		public Color convertXYZToRGB(final Color color) {
-			final float x = color.r;
-			final float y = color.g;
-			final float z = color.b;
+		public Color convertXYZToRGB(final XYZColor color) {
+			final float x = color.x;
+			final float y = color.y;
+			final float z = color.z;
 			
 			final float r = this.elementRX * x + this.elementRY * y + this.elementRZ * z;
 			final float g = this.elementGX * x + this.elementGY * y + this.elementGZ * z;
