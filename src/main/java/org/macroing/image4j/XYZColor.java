@@ -78,6 +78,19 @@ public final class XYZColor {
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
+	 * Returns a {@link Color} representation of this {@code XYZColor} instance.
+	 * 
+	 * @return a {@code Color} representation of this {@code XYZColor} instance
+	 */
+	public Color toColor() {
+		final float r = 3.240479F * this.x - 1.537150F * this.y - 0.498535F * this.z;
+		final float g = -0.969256F * this.x + 1.875991F * this.y + 0.041556F * this.z;
+		final float b = 0.055648F * this.x - 0.204043F * this.y + 1.057311F * this.z;
+		
+		return new Color(r, g, b);
+	}
+	
+	/**
 	 * Returns a {@code String} representation of this {@code XYZColor} instance.
 	 * 
 	 * @return a {@code String} representation of this {@code XYZColor} instance
@@ -85,6 +98,36 @@ public final class XYZColor {
 	@Override
 	public String toString() {
 		return String.format("new XYZColor(%s, %s, %s)", Float.toString(this.x), Float.toString(this.y), Float.toString(this.z));
+	}
+	
+	/**
+	 * Adds the component values of {@code color} to the component values of this {@code XYZColor} instance.
+	 * <p>
+	 * Returns a new {@code XYZColor} instance with the result of the addition.
+	 * <p>
+	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param color the {@code XYZColor} to add
+	 * @return a new {@code XYZColor} instance with the result of the addition
+	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
+	 */
+	public XYZColor add(final XYZColor color) {
+		return new XYZColor(this.x + color.x, this.y + color.y, this.z + color.z);
+	}
+	
+	/**
+	 * Multiplies the component values of this {@code XYZColor} instance with the component values of {@code color}.
+	 * <p>
+	 * Returns a new {@code XYZColor} instance with the result of the multiplication.
+	 * <p>
+	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param color the {@code XYZColor} to multiply with
+	 * @return a new {@code XYZColor} instance with the result of the multiplication
+	 * @throws NullPointerException thrown if, and only if, {@code color} is {@code null}
+	 */
+	public XYZColor multiply(final XYZColor color) {
+		return new XYZColor(this.x * color.x, this.y * color.y, this.z * color.z);
 	}
 	
 	/**

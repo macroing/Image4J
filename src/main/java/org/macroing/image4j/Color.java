@@ -19,6 +19,7 @@
 package org.macroing.image4j;
 
 import static org.macroing.math4j.MathF.exp;
+import static org.macroing.math4j.MathF.pow;
 import static org.macroing.math4j.MathI.toInt;
 
 import java.util.Objects;
@@ -697,6 +698,22 @@ public final class Color {
 	}
 	
 	/**
+	 * Redoes gamma correction on this {@code Color} instance using the algorithm provided by PBRT.
+	 * <p>
+	 * Returns a new {@code Color} instance with gamma correction redone.
+	 * 
+	 * @return a new {@code Color} instance with gamma correction redone
+	 */
+	public Color redoGammaCorrectionPBRT() {
+		final float r = doRedoGammaCorrectionPBRT(this.r);
+		final float g = doRedoGammaCorrectionPBRT(this.g);
+		final float b = doRedoGammaCorrectionPBRT(this.b);
+		final float a = this.a;
+		
+		return new Color(r, g, b, a);
+	}
+	
+	/**
 	 * Saturates this {@code Color} instance, such that each component value will lie in the range {@code [0.0F, 1.0F]}.
 	 * <p>
 	 * Returns a new {@code Color} instance with the result of the saturation.
@@ -1044,6 +1061,22 @@ public final class Color {
 	}
 	
 	/**
+	 * Undoes gamma correction on this {@code Color} instance using the algorithm provided by PBRT.
+	 * <p>
+	 * Returns a new {@code Color} instance with gamma correction undone.
+	 * 
+	 * @return a new {@code Color} instance with gamma correction undone
+	 */
+	public Color undoGammaCorrectionPBRT() {
+		final float r = doUndoGammaCorrectionPBRT(this.r);
+		final float g = doUndoGammaCorrectionPBRT(this.g);
+		final float b = doUndoGammaCorrectionPBRT(this.b);
+		final float a = this.a;
+		
+		return new Color(r, g, b, a);
+	}
+	
+	/**
 	 * Returns a {@code String} representation of this {@code Color} instance.
 	 * 
 	 * @return a {@code String} representation of this {@code Color} instance
@@ -1051,6 +1084,19 @@ public final class Color {
 	@Override
 	public String toString() {
 		return String.format("new Color(%s, %s, %s, %s)", Float.toString(this.r), Float.toString(this.g), Float.toString(this.b), Float.toString(this.a));
+	}
+	
+	/**
+	 * Returns an {@link XYZColor} representation of this {@code Color} instance.
+	 * 
+	 * @return an {@code XYZColor} representation of this {@code Color} instance
+	 */
+	public XYZColor toXYZColor() {
+		final float x = 0.412453F * this.r + 0.357580F * this.g + 0.180423F * this.b;
+		final float y = 0.212671F * this.r + 0.715160F * this.g + 0.072169F * this.b;
+		final float z = 0.019334F * this.r + 0.119193F * this.g + 0.950227F * this.b;
+		
+		return new XYZColor(x, y, z);
 	}
 	
 	/**
@@ -1488,6 +1534,14 @@ public final class Color {
 	
 	private static float doConvertComponentValueFromIntToFloat(final int componentValue) {
 		return MathI.saturate(componentValue) / 255.0F;
+	}
+	
+	private static float doRedoGammaCorrectionPBRT(final float value) {
+		return value <= 0.0031308F ? 12.92F * value : 1.055F * pow(value, 1.0F / 2.4F) - 0.055F;
+	}
+	
+	private static float doUndoGammaCorrectionPBRT(final float value) {
+		return value <= 0.04045F ? value * 1.0F / 12.92F : pow((value + 0.055F) * 1.0F / 1.055F, 2.4F);
 	}
 	
 	private static int doConvertComponentValueFromFloatToInt(final float componentValue) {
