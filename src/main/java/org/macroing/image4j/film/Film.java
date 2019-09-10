@@ -296,7 +296,7 @@ public final class Film {
 	}
 	
 	/**
-	 * Updates the {@link Image} of this {@code Film} instance with the current film colors.
+	 * Renders the color samples collected by this {@code Film} instance to the associated {@link Image} instance.
 	 * 
 	 * @param splatScale the splat scale to use
 	 */
