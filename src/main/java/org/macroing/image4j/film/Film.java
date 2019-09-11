@@ -38,10 +38,11 @@ import org.macroing.math4j.MathF;
 /**
  * A {@code Film} represents a camera film that can collect color samples and render them to an {@link Image} instance.
  * <p>
- * Almost all methods in this class will check if the resolution of its associated {@code Image} instance has changed. If it has changed, the resolution of the {@code Film} instance will be updated. This update will also reset the state of the
- * {@code Film} instance. This means that all color samples that have been collected will be gone.
+ * Almost all methods in this class will check if the resolution of its associated {@code Image} instance has changed. If it has changed, the resolution of the {@code Film} instance will be updated. This update will also clear the {@code Film}
+ * instance, which means that all color samples that have been collected will be discarded.
  * <p>
- * When you update the resolution of the {@code Image} instance, you can update the resolution of the {@code Film} instance manually by calling {@link #setImage(Image)}. This will also reset the state of the {@code Film} instance.
+ * When you update the resolution of the {@code Image} instance, you can update the resolution of the {@code Film} instance manually by calling {@link #setImage(Image)}. This will also clear the {@code Film} instance. If you only want to clear the
+ * {@code Film} instance, you can call {@link #clear()}.
  * 
  * @since 1.0.0
  * @author J&#246;rgen Lundgren
@@ -197,9 +198,12 @@ public final class Film {
 	}
 	
 	/**
-	 * Adds {@code color} to the pixel represented by {@code x} and {@code y}.
+	 * Adds {@code color} to the pixel represented by {@code x} and {@code y}, but only if {@code x} and {@code y} are inside the boundaries of this {@code Film} instance.
 	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * This method will check if the resolution of the associated {@link Image} instance has changed. If it has changed, the resolution of this {@code Film} instance will be updated. This update will also clear this {@code Film} instance, which means
+	 * that all color samples that have been collected will be discarded.
 	 * <p>
 	 * Calling this method is equivalent to the following:
 	 * <pre>
@@ -218,9 +222,12 @@ public final class Film {
 	}
 	
 	/**
-	 * Adds {@code color} to the pixel represented by {@code x} and {@code y}.
+	 * Adds {@code color} to the pixel represented by {@code x} and {@code y}, but only if {@code x} and {@code y} are inside the boundaries of this {@code Film} instance.
 	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * This method will check if the resolution of the associated {@link Image} instance has changed. If it has changed, the resolution of this {@code Film} instance will be updated. This update will also clear this {@code Film} instance, which means
+	 * that all color samples that have been collected will be discarded.
 	 * 
 	 * @param x the X-coordinate of the pixel
 	 * @param y the Y-coordinate of the pixel
@@ -285,7 +292,10 @@ public final class Film {
 	}
 	
 	/**
-	 * Clears this {@code Film} instance.
+	 * Clears this {@code Film} instance, which means that all color samples that have been collected will be discarded.
+	 * <p>
+	 * This method will check if the resolution of the associated {@link Image} instance has changed. If it has changed, the resolution of this {@code Film} instance will be updated. This update will also clear this {@code Film} instance, which means
+	 * that all color samples that have been collected will be discarded.
 	 */
 	public void clear() {
 		doUpdateVariablesIfImageHasChanged();
@@ -297,6 +307,9 @@ public final class Film {
 	
 	/**
 	 * Renders the color samples collected by this {@code Film} instance to the associated {@link Image} instance.
+	 * <p>
+	 * This method will check if the resolution of the associated {@link Image} instance has changed. If it has changed, the resolution of this {@code Film} instance will be updated. This update will also clear this {@code Film} instance, which means
+	 * that all color samples that have been collected will be discarded.
 	 * 
 	 * @param splatScale the splat scale to use
 	 */
@@ -353,9 +366,12 @@ public final class Film {
 	}
 	
 	/**
-	 * Sets the {@link Image} of this {@code Film} instance to {@code image}.
+	 * Sets the associated {@link Image} of this {@code Film} instance to {@code image}.
 	 * <p>
 	 * If {@code image} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * If {@code image} is already associated with this {@code Film} instance and its resolution has not changed, nothing will happen. Otherwise the resolution of this {@code Film} instance will be updated. This update will clear this {@code Film}
+	 * instance, which means that all color samples that have been collected will be discarded.
 	 * 
 	 * @param image the new {@code Image} instance
 	 * @throws NullPointerException thrown if, and only if, {@code image} is {@code null}
@@ -372,11 +388,12 @@ public final class Film {
 	}
 	
 	/**
-	 * Splats {@code color} on the pixel represented by {@code x} and {@code y}.
-	 * <p>
-	 * If {@code x} or {@code y} are outside the region of this {@code Film} instance, nothing will happen.
+	 * Splats {@code color} on the pixel represented by {@code x} and {@code y}, but only if {@code x} and {@code y} are inside the boundaries of this {@code Film} instance.
 	 * <p>
 	 * If {@code color} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * <p>
+	 * This method will check if the resolution of the associated {@link Image} instance has changed. If it has changed, the resolution of this {@code Film} instance will be updated. This update will also clear this {@code Film} instance, which means
+	 * that all color samples that have been collected will be discarded.
 	 * 
 	 * @param x the X-coordinate of the pixel
 	 * @param y the Y-coordinate of the pixel
