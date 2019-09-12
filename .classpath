@@ -2,6 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/org.macroing.math4j.jar"/>
+	<classpathentry kind="lib" path="lib/org.macroing.math4j.jar" sourcepath="lib/org.macroing.math4j-src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
