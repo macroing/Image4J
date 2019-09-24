@@ -1127,6 +1127,15 @@ public final class Color {
 	}
 	
 	/**
+	 * Returns {@code true} if, and only if, this {@code Color} instance is black, {@code false} otherwise.
+	 * 
+	 * @return {@code true} if, and only if, this {@code Color} instance is black, {@code false} otherwise
+	 */
+	public boolean isBlack() {
+		return this.r <= 0.0F && this.g <= 0.0F && this.b <= 0.0F;
+	}
+	
+	/**
 	 * Returns the value of the alpha component (A) as a {@code byte}.
 	 * <p>
 	 * This method assumes the component value to be within the range {@code [0.0, 1.0]}. A component value outside of this range will be clamped.
