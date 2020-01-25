@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 J&#246;rgen Lundgren
+ * Copyright 2019 - 2020 J&#246;rgen Lundgren
  * 
  * This file is part of org.macroing.image4j.
  * 
@@ -50,9 +50,24 @@ public final class Color {
 	public static final Color BLUE = new Color(0.0F, 0.0F, 1.0F);
 	
 	/**
+	 * A {@code Color} denoting the color copper.
+	 */
+	public static final Color COPPER = new Color(0.72F, 0.45F, 0.2F);
+	
+	/**
 	 * A {@code Color} denoting the color cyan.
 	 */
 	public static final Color CYAN = new Color(0.0F, 1.0F, 1.0F);
+	
+	/**
+	 * A {@code Color} denoting the color Aztek gold.
+	 */
+	public static final Color GOLD_AZTEK = new Color(0.76F, 0.6F, 0.33F);
+	
+	/**
+	 * A {@code Color} denoting the color metallic gold.
+	 */
+	public static final Color GOLD_METALLIC = new Color(0.83F, 0.69F, 0.22F);
 	
 	/**
 	 * A {@code Color} denoting the color gray.
