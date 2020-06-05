@@ -1,3 +1,8 @@
+2020-06-05  Jörgen Lundgren  <joergen.lundgren@macroing.org>
+
+	* CHANGE:	The build.xml file no longer excludes certain packages. The example classes that were provided locally have been moved to their own local project.
+	* CHANGE:	The .gitignore file now ignores the distribution directory.
+
 2020-04-04  Jörgen Lundgren  <joergen.lundgren@macroing.org>
 
 	* CHANGE:	Update version to 0.0.3.

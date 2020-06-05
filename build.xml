@@ -38,9 +38,6 @@
 			<include name="org/macroing/image4j/film/**"/>
 			<include name="org/macroing/image4j/filter/**"/>
 			<include name="org/macroing/image4j/spectralcurve/**"/>
-			
-			<exclude name="org/macroing/image4j/example/**"/>
-			<exclude name="org/macroing/image4j/test/**"/>
 		</javac>
 		
 		<!--Initialize time-stamps.-->
@@ -74,9 +71,6 @@
 				<include name="org/macroing/image4j/film/**"/>
 				<include name="org/macroing/image4j/filter/**"/>
 				<include name="org/macroing/image4j/spectralcurve/**"/>
-				
-				<exclude name="org/macroing/image4j/example/**"/>
-				<exclude name="org/macroing/image4j/test/**"/>
 			</fileset>
 		</javadoc>
 		
@@ -90,7 +84,7 @@
 		
 		<!--Copy the source code.-->
 		<copy todir="${project.directory.distribution.current}/src">
-			<fileset dir="${project.directory.source}" excludes="org/macroing/image4j/example/** org/macroing/image4j/test/**"/>
+			<fileset dir="${project.directory.source}"/>
 		</copy>
 		
 		<!--Copy the library dependencies.-->
