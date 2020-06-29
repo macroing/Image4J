@@ -1,3 +1,10 @@
+2020-06-29  Jörgen Lundgren  <joergen.lundgren@macroing.org>
+
+	* ADD:		Add new methods to the Color class to check if it has a given color.
+	* ADD:		Add the method createScreenCapture(Rectangle2I) to the Image class, to create a screen capture.
+	* ADD:		Add the method findImageBoundsFor(Image) to the Image class, to find all Rectangle2I bounds of an Image in a given Image.
+	* CHANGE:	Update to the latest version of Math4J.
+
 2020-06-05  Jörgen Lundgren  <joergen.lundgren@macroing.org>
 
 	* CHANGE:	The build.xml file no longer excludes certain packages. The example classes that were provided locally have been moved to their own local project.

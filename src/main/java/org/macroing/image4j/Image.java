@@ -27,18 +27,26 @@ import static org.macroing.math4j.MathI.min;
 import static org.macroing.math4j.MathI.modulo;
 import static org.macroing.math4j.MathI.toInt;
 
+import java.awt.AWTException;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javax.imageio.ImageIO;
+
+import org.macroing.math4j.Point2I;
+import org.macroing.math4j.Rectangle2I;
 
 /**
  * An {@code Image} is an image that can be drawn to.
@@ -49,6 +57,10 @@ import javax.imageio.ImageIO;
  * @author J&#246;rgen Lundgren
  */
 public final class Image {
+	private static final Robot ROBOT = doCreateRobot();
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	private Color[] colors;
 	private int resolution;
 	private int resolutionX;
@@ -411,6 +423,46 @@ public final class Image {
 		}
 		
 		return imageB;
+	}
+	
+	/**
+	 * Finds the bounds for {@code image} in this {@code Image} instance.
+	 * <p>
+	 * Returns a {@code List} with all {@code Rectangle2I} bounds found for {@code image} in this {@code Image} instance.
+	 * <p>
+	 * If {@code image} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param image an {@code Image}
+	 * @return a {@code List} with all {@code Rectangle2I} bounds found for {@code image} in this {@code Image} instance
+	 * @throws NullPointerException thrown if, and only if, {@code image} is {@code null}
+	 */
+	public List<Rectangle2I> findImageBoundsFor(final Image image) {
+		Objects.requireNonNull(image, "image == null");
+		
+		final List<Rectangle2I> rectangle2Is = new ArrayList<>();
+		
+		for(int y = 0; y < getResolutionY() - image.getResolutionY(); y++) {
+			for(int x = 0; x < getResolutionX() - image.getResolutionX(); x++) {
+				Rectangle2I rectangle2I = new Rectangle2I(new Point2I(x, y), new Point2I(x, y));
+				
+				labelImage:
+				if(getColor(x, y).equals(image.getColor(0, 0))) {
+					for(int imageY = 0; imageY < image.getResolutionY(); imageY++) {
+						for(int imageX = 0; imageX < image.getResolutionX(); imageX++) {
+							if(!getColor(x + imageX, y + imageY).equals(image.getColor(imageX, imageY))) {
+								break labelImage;
+							}
+							
+							rectangle2I = new Rectangle2I(new Point2I(x, y), new Point2I(x + imageX + 1, y + imageY + 1));
+						}
+					}
+					
+					rectangle2Is.add(rectangle2I);
+				}
+			}
+		}
+		
+		return rectangle2Is;
 	}
 	
 	/**
@@ -1829,6 +1881,27 @@ public final class Image {
 	}
 	
 	/**
+	 * Creates an {@code Image} by capturing the contents of the screen, without the mouse cursor.
+	 * <p>
+	 * Returns a new {@code Image} instance.
+	 * <p>
+	 * If {@code rectangle} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
+	 * @param rectangle a {@code Rectangle2I} that contains the bounds
+	 * @return a new {@code Image} instance
+	 * @throws NullPointerException thrown if, and only if, {@code rectangle} is {@code null}
+	 */
+	public static Image createScreenCapture(final Rectangle2I rectangle) {
+		Objects.requireNonNull(rectangle, "rectangle == null");
+		
+		if(ROBOT != null) {
+			return toImage(ROBOT.createScreenCapture(new Rectangle(rectangle.getA().x, rectangle.getA().y, rectangle.getC().x - rectangle.getA().x, rectangle.getC().y - rectangle.getA().y)));
+		}
+		
+		return new Image(0, 0);
+	}
+	
+	/**
 	 * Loads an {@code Image} from the file represented by {@code file}.
 	 * <p>
 	 * Returns a new {@code Image} instance.
@@ -2187,5 +2260,13 @@ public final class Image {
 		}
 		
 		return colorArray;
+	}
+	
+	private static Robot doCreateRobot() {
+		try {
+			return new Robot();
+		} catch(final AWTException e) {
+			return null;
+		}
 	}
 }

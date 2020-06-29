@@ -1143,11 +1143,149 @@ public final class Color {
 	
 	/**
 	 * Returns {@code true} if, and only if, this {@code Color} instance is black, {@code false} otherwise.
+	 * <p>
+	 * A {@code Color} instance is black if the red (R), green (G) and blue (B) component values are {@code 0.0F}.
 	 * 
 	 * @return {@code true} if, and only if, this {@code Color} instance is black, {@code false} otherwise
 	 */
 	public boolean isBlack() {
-		return this.r <= 0.0F && this.g <= 0.0F && this.b <= 0.0F;
+		return MathF.equals(this.r, this.g, this.b, 0.0F);
+	}
+	
+	/**
+	 * Returns {@code true} if, and only if, this {@code Color} instance is considered blue, {@code false} otherwise.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * color.isBlue(1.0F, 1.0F);
+	 * }
+	 * </pre>
+	 * 
+	 * @return {@code true} if, and only if, this {@code Color} instance is considered blue, {@code false} otherwise
+	 */
+	public boolean isBlue() {
+		return isBlue(1.0F, 1.0F);
+	}
+	
+	/**
+	 * Returns {@code true} if, and only if, this {@code Color} instance is considered blue, {@code false} otherwise.
+	 * <p>
+	 * The {@code Color} instance {@code color} is considered blue if, and only if, {@code color.getB() - thresholdR >= color.getR()} and {@code color.getB() - thresholdG >= color.getG()}.
+	 * 
+	 * @param thresholdR the threshold for the red component (R)
+	 * @param thresholdG the threshold for the green component (G)
+	 * @return {@code true} if, and only if, this {@code Color} instance is considered blue, {@code false} otherwise
+	 */
+	public boolean isBlue(final float thresholdR, final float thresholdG) {
+		return this.b - thresholdR >= this.r && this.b - thresholdG >= this.g;
+	}
+	
+	/**
+	 * Returns {@code true} if, and only if, this {@code Color} instance is considered cyan, {@code false} otherwise.
+	 * 
+	 * @return {@code true} if, and only if, this {@code Color} instance is considered cyan, {@code false} otherwise
+	 */
+	public boolean isCyan() {
+		return isGreen(1.0F, 0.5F) && isBlue(1.0F, 0.5F);
+	}
+	
+	/**
+	 * Returns {@code true} if, and only if, this {@code Color} instance is gray, {@code false} otherwise.
+	 * <p>
+	 * A {@code Color} instance is gray if the red (R), green (G) and blue (B) component values are equal.
+	 * 
+	 * @return {@code true} if, and only if, this {@code Color} instance is gray, {@code false} otherwise
+	 */
+	public boolean isGray() {
+		return MathF.equals(this.r, this.g, this.b);
+	}
+	
+	/**
+	 * Returns {@code true} if, and only if, this {@code Color} instance is considered green, {@code false} otherwise.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * color.isGreen(1.0F, 1.0F);
+	 * }
+	 * </pre>
+	 * 
+	 * @return {@code true} if, and only if, this {@code Color} instance is considered green, {@code false} otherwise
+	 */
+	public boolean isGreen() {
+		return isGreen(1.0F, 1.0F);
+	}
+	
+	/**
+	 * Returns {@code true} if, and only if, this {@code Color} instance is considered green, {@code false} otherwise.
+	 * <p>
+	 * The {@code Color} instance {@code color} is considered green if, and only if, {@code color.getG() - thresholdR >= color.getR()} and {@code color.getG() - thresholdB >= color.getB()}.
+	 * 
+	 * @param thresholdR the threshold for the red component (R)
+	 * @param thresholdB the threshold for the blue component (B)
+	 * @return {@code true} if, and only if, this {@code Color} instance is considered green, {@code false} otherwise
+	 */
+	public boolean isGreen(final float thresholdR, final float thresholdB) {
+		return this.g - thresholdR >= this.r && this.g - thresholdB >= this.b;
+	}
+	
+	/**
+	 * Returns {@code true} if, and only if, this {@code Color} instance is considered magenta, {@code false} otherwise.
+	 * 
+	 * @return {@code true} if, and only if, this {@code Color} instance is considered magenta, {@code false} otherwise
+	 */
+	public boolean isMagenta() {
+		return isRed(1.0F, 0.5F) && isBlue(0.5F, 1.0F);
+	}
+	
+	/**
+	 * Returns {@code true} if, and only if, this {@code Color} instance is considered red, {@code false} otherwise.
+	 * <p>
+	 * Calling this method is equivalent to the following:
+	 * <pre>
+	 * {@code
+	 * color.isRed(1.0F, 1.0F);
+	 * }
+	 * </pre>
+	 * 
+	 * @return {@code true} if, and only if, this {@code Color} instance is considered red, {@code false} otherwise
+	 */
+	public boolean isRed() {
+		return isRed(1.0F, 1.0F);
+	}
+	
+	/**
+	 * Returns {@code true} if, and only if, this {@code Color} instance is considered red, {@code false} otherwise.
+	 * <p>
+	 * The {@code Color} instance {@code color} is considered red if, and only if, {@code color.getR() - thresholdG >= color.getG()} and {@code color.getR() - thresholdB >= color.getB()}.
+	 * 
+	 * @param thresholdG the threshold for the green component (G)
+	 * @param thresholdB the threshold for the blue component (B)
+	 * @return {@code true} if, and only if, this {@code Color} instance is considered red, {@code false} otherwise
+	 */
+	public boolean isRed(final float thresholdG, final float thresholdB) {
+		return this.r - thresholdG >= this.g && this.r - thresholdB >= this.b;
+	}
+	
+	/**
+	 * Returns {@code true} if, and only if, this {@code Color} instance is white, {@code false} otherwise.
+	 * <p>
+	 * A {@code Color} instance is white if the red (R), green (G) and blue (B) component values are {@code 1.0F}.
+	 * 
+	 * @return {@code true} if, and only if, this {@code Color} instance is white, {@code false} otherwise
+	 */
+	public boolean isWhite() {
+		return MathF.equals(this.r, this.g, this.b, 1.0F);
+	}
+	
+	/**
+	 * Returns {@code true} if, and only if, this {@code Color} instance is considered yellow, {@code false} otherwise.
+	 * 
+	 * @return {@code true} if, and only if, this {@code Color} instance is considered yellow, {@code false} otherwise
+	 */
+	public boolean isYellow() {
+		return isRed(0.5F, 1.0F) && isGreen(0.5F, 1.0F);
 	}
 	
 	/**
