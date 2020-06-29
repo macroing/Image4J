@@ -1311,10 +1311,10 @@ public final class Image {
 		
 		for(int i = y; i < y + h; i++) {
 			for(int j = x; j < x + w; j++) {
-				final Color oldColor = getColor(x, y);
-				final Color newColor = Objects.requireNonNull(pixelFunction.apply(x, y, oldColor));
+				final Color oldColor = getColor(j, i);
+				final Color newColor = Objects.requireNonNull(pixelFunction.apply(j, i, oldColor));
 				
-				doSetColor(x, y, newColor);
+				doSetColor(j, i, newColor);
 			}
 		}
 	}
@@ -1887,18 +1887,48 @@ public final class Image {
 	 * <p>
 	 * If {@code rectangle} is {@code null}, a {@code NullPointerException} will be thrown.
 	 * 
+	 * @param rectangle a {@code Rectangle} that contains the bounds
+	 * @return a new {@code Image} instance
+	 * @throws NullPointerException thrown if, and only if, {@code rectangle} is {@code null}
+	 */
+	public static Image createScreenCapture(final Rectangle rectangle) {
+		Objects.requireNonNull(rectangle, "rectangle == null");
+		
+		if(ROBOT != null) {
+			return toImage(ROBOT.createScreenCapture(rectangle));
+		}
+		
+		return new Image(0, 0);
+	}
+	
+	/**
+	 * Creates an {@code Image} by capturing the contents of the screen, without the mouse cursor.
+	 * <p>
+	 * Returns a new {@code Image} instance.
+	 * <p>
+	 * If {@code rectangle} is {@code null}, a {@code NullPointerException} will be thrown.
+	 * 
 	 * @param rectangle a {@code Rectangle2I} that contains the bounds
 	 * @return a new {@code Image} instance
 	 * @throws NullPointerException thrown if, and only if, {@code rectangle} is {@code null}
 	 */
 	public static Image createScreenCapture(final Rectangle2I rectangle) {
-		Objects.requireNonNull(rectangle, "rectangle == null");
-		
-		if(ROBOT != null) {
-			return toImage(ROBOT.createScreenCapture(new Rectangle(rectangle.getA().x, rectangle.getA().y, rectangle.getC().x - rectangle.getA().x, rectangle.getC().y - rectangle.getA().y)));
-		}
-		
-		return new Image(0, 0);
+		return createScreenCapture(new Rectangle(rectangle.getA().x, rectangle.getA().y, rectangle.getC().x - rectangle.getA().x, rectangle.getC().y - rectangle.getA().y));
+	}
+	
+	/**
+	 * Creates an {@code Image} by capturing the contents of the screen, without the mouse cursor.
+	 * <p>
+	 * Returns a new {@code Image} instance.
+	 * 
+	 * @param x the X-coordinate
+	 * @param y the Y-coordinate
+	 * @param w the width
+	 * @param h the height
+	 * @return a new {@code Image} instance
+	 */
+	public static Image createScreenCapture(final int x, final int y, final int w, final int h) {
+		return createScreenCapture(new Rectangle(x, y, w, h));
 	}
 	
 	/**
