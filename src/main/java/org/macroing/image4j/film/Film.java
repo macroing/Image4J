@@ -278,7 +278,7 @@ public final class Film {
 			for(int filterY = minimumFilterY; filterY <= maximumFilterY; filterY++) {
 				for(int filterX = minimumFilterX; filterX <= maximumFilterX; filterX++) {
 					final int filterTableOffset = filterOffsetY[filterY - minimumFilterY] * FILTER_TABLE_SIZE + filterOffsetX[filterX - minimumFilterX];
-					final int pixelOffset = filterY * resolutionX + filterX; 
+					final int pixelOffset = filterY * resolutionX + filterX;
 					
 					final float filterWeight = filterTable[filterTableOffset];
 					
@@ -414,7 +414,7 @@ public final class Film {
 		final int resolutionY = getResolutionY();
 		
 		if(currentX >= 0 && currentX < resolutionX && currentY >= 0 && currentY < resolutionY) {
-			final int pixelOffset = currentY * resolutionX + currentX; 
+			final int pixelOffset = currentY * resolutionX + currentX;
 			
 			final
 			Pixel pixel = pixels[pixelOffset];
