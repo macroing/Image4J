@@ -1,4 +1,4 @@
-Image4J v.0.0.3
+Image4J v.0.0.4
 ===============
 Image4J is an image processing library for Java.
 

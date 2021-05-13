@@ -850,7 +850,7 @@ public final class Color {
 	 * Calling this method is equivalent to the following:
 	 * <pre>
 	 * {@code
-	 * color.toneMappingFilmicCurve(exposure, a, b, c, d, e, 0.0F, Float.MIN_VALUE)
+	 * color.toneMappingFilmicCurve(exposure, a, b, c, d, e, 0.0F, -Float.MAX_VALUE)
 	 * }
 	 * </pre>
 	 * 
@@ -863,7 +863,7 @@ public final class Color {
 	 * @return a new {@code Color} instance with the result of the tone mapping operation
 	 */
 	public Color toneMappingFilmicCurve(final float exposure, final float a, final float b, final float c, final float d, final float e) {
-		return toneMappingFilmicCurve(exposure, a, b, c, d, e, 0.0F, Float.MIN_VALUE);
+		return toneMappingFilmicCurve(exposure, a, b, c, d, e, 0.0F, -Float.MAX_VALUE);
 	}
 	
 	/**
